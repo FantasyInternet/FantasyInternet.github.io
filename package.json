@@ -11,7 +11,7 @@
     "prepublish": "jake",
     "build": "jake",
     "deploy": "jake deploy",
-    "start": "statify -d ./build/",
+    "start": "statify -d ./",
     "watch": "jake watch"
   },
   "devDependencies": {
