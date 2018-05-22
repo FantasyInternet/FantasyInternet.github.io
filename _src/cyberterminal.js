@@ -16,8 +16,8 @@ else{this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});thi
 connectTo(url){return __awaiter(this,void 0,void 0,function*(){if(this._connecting)
 return;this._connecting=true;let machine=this.addMachine();let msg=yield this._findBoot(url);if(msg.wasm){machine.send(msg);this._connecting=setTimeout(()=>{this._connecting=null;},1024);}
 else if(typeof process!=="undefined"){this._connecting=setTimeout(()=>{this.removeMachine();this._connecting=null;},1024);this.sys.openWeb(url);}
-else
-this.sys.openWeb(url);});}
+else if(location.toString()!==url){this.sys.openWeb(url);}
+else{console.error("could not load boot.wasm!");}});}
 addMachine(){if(this.machineWorkers.length)
 this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});let machine=this.sys.createMachine();this.machineWorkers.push(machine);machine.onMessage(this._onMessage.bind(this));this.sys.textInput.setState({text:"",pos:0,len:0});this.sys.chipSound.stopAll();return machine;}
 removeMachine(){let machine=this.machineWorkers.pop();if(machine)
@@ -42,7 +42,8 @@ else if(state.level===1){let msg={cmd:"break",state:state};if(!this.machineWorke
 return;this.machineWorkers[this.machineWorkers.length-1].send(msg);}
 else if(state.level===2){if(!this.machineWorkers.length)
 return;this.machineWorkers[this.machineWorkers.length-1].terminate();this.sys.startTone(0,256,1,"square");setTimeout(()=>{this.sys.stopTone(0);},128);this._disconnecting=true;}}
-_findBoot(url){return __awaiter(this,void 0,void 0,function*(){if(url.substr(0,5)!=="file:"){url=(yield fetch(url)).url;}
+_findBoot(url){return __awaiter(this,void 0,void 0,function*(){if(url.substr(0,5)!=="file:"){try{url=(yield fetch(url)).url;}
+catch(error){return{};}}
 let parts=url.split("/");let candidate=parts.shift()+"/"+parts.shift()+"/";let wasm=null;while(parts.length&&!wasm){candidate+=parts.shift()+"/";try{wasm=yield this.sys.read(candidate+"boot.wasm",{type:"binary"});}
 catch(error){wasm=null;}}
 return{cmd:"boot",wasm:wasm,url:url,origin:candidate};});}}
@@ -125,7 +126,8 @@ startTone(channel,frequency,volume=1,type=0){this._sysCall("startTone",channel,f
 stopTone(channel){this._sysCall("stopTone",channel);}
 wabt(){let wast=this._popString();let module=wabt_1.default.parseWat("idunno.wast",wast);return this._pushArrayBuffer(module.toBinary({}).buffer);}
 _tick(){if(!this._active)
-return;let t=performance.now();let process=this._processes[0];setTimeout(this._tick.bind(this),this._nextUpdate-t);let updated=!(process.instance.exports.update);if(t>=this._nextUpdate&&process.instance.exports.update){if(this._updateInterval<=0)
+return;let t=performance.now();let process=this._processes[0];if(!process)
+return this._active=false;setTimeout(this._tick.bind(this),this._nextUpdate-t);let updated=!(process.instance.exports.update);if(t>=this._nextUpdate&&process.instance.exports.update){if(this._updateInterval<=0)
 this._updateInterval=1;while(t>=this._nextUpdate){process.instance.exports.update(this._nextUpdate);updated=true;this._nextUpdate+=this._updateInterval;}}
 if(this._transferBuffer&&updated&&process.instance.exports.draw){process.instance.exports.draw(t);}
 this._nextFrame+=this._frameInterval;}
