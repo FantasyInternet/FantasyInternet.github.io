@@ -14,14 +14,14 @@ function step(result){result.done?resolve(result.value):new P(function(resolve){
 step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});class CyberTerminal{constructor(sys){this.sys=sys;this.machineWorkers=[];this._disconnecting=false;this.sys.textInput.addEventListener(this._onTextInput.bind(this));this.sys.mouseInput.addEventListener(this._onMouseInput.bind(this));this.sys.gameInput.addEventListener(this._onGameInput.bind(this));this.sys.breaker.addEventListener(this._onBreak.bind(this));this.connectTo(location.toString());document.addEventListener("visibilitychange",()=>{if(this.machineWorkers.length){if(document.visibilityState==="visible"){this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
 else{this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});this.sys.chipSound.stopAll();}}});}
 connectTo(url){return __awaiter(this,void 0,void 0,function*(){if(this._connecting)
-return;this._connecting=true;let machine=this.addMachine();let msg=yield this._findBoot(url);if(msg.wasm){machine.send(msg);this._connecting=setTimeout(()=>{this._connecting=null;},1024);}
-else if(typeof process!=="undefined"){this._connecting=setTimeout(()=>{this.removeMachine();this._connecting=null;},1024);this.sys.openWeb(url);}
-else if(location.toString()!==url){this.sys.openWeb(url);}
-else{console.error("could not load boot.wasm!");}});}
+return;this.sys.setDisplayMode("text",url.length,4);this.sys.print("Connecting to\n"+url);this._connecting=true;let machine=this.addMachine();let msg=yield this._findBoot(url);if(msg.wasm){this.sys.print(".");this.sys.setTitle(""+msg.url);machine.send(msg);this._connecting=setTimeout(()=>{this._connecting=null;},1024);}
+else if(typeof process!=="undefined"){this.sys.print(".");this._connecting=setTimeout(()=>{this.removeMachine();this._connecting=null;},1024);this.sys.openWeb(url);}
+else if(location.toString()!==url){this.sys.print(".");this.sys.openWeb(url);}
+else{this.sys.print("!\n");this.sys.print("could not load boot.wasm!");}});}
 addMachine(){if(this.machineWorkers.length)
 this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});let machine=this.sys.createMachine();this.machineWorkers.push(machine);machine.onMessage(this._onMessage.bind(this));this.sys.textInput.setState({text:"",pos:0,len:0});this.sys.chipSound.stopAll();return machine;}
 removeMachine(){let machine=this.machineWorkers.pop();if(machine)
-machine.terminate();setTimeout(()=>{if(this.machineWorkers.length){this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
+machine.terminate();this.sys.setDisplayMode("text",16,4);this.sys.print("Disconnecting...");setTimeout(()=>{if(this.machineWorkers.length){this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
 else{if(history.length>1){history.back();}
 else{location.reload(true);}}},128);this.sys.textInput.setState({text:"",pos:0,len:0});this.sys.chipSound.stopAll();}
 _onMessage(message,machineWorker){switch(message.cmd){case"call":let value;try{message.success=true;if(this[message.method]){value=this[message.method].apply(this,message.arguments);}
@@ -42,11 +42,11 @@ else if(state.level===1){let msg={cmd:"break",state:state};if(!this.machineWorke
 return;this.machineWorkers[this.machineWorkers.length-1].send(msg);}
 else if(state.level===2){if(!this.machineWorkers.length)
 return;this.machineWorkers[this.machineWorkers.length-1].terminate();this.sys.startTone(0,256,1,"square");setTimeout(()=>{this.sys.stopTone(0);},128);this._disconnecting=true;}}
-_findBoot(url){return __awaiter(this,void 0,void 0,function*(){if(url.substr(0,5)!=="file:"){try{url=(yield fetch(url)).url;}
+_findBoot(url){return __awaiter(this,void 0,void 0,function*(){this.sys.print(".");if(url.substr(0,5)!=="file:"){try{url=(yield fetch(url)).url;}
 catch(error){return{};}}
-let parts=url.split("/");let candidate=parts.shift()+"/"+parts.shift()+"/";let wasm=null;while(parts.length&&!wasm){candidate+=parts.shift()+"/";try{wasm=yield this.sys.read(candidate+"boot.wasm",{type:"binary"});}
+let parts=url.split("/");let candidate=parts.shift()+"/"+parts.shift()+"/";let wasm=null;while(parts.length&&!wasm){this.sys.print(".");candidate+=parts.shift()+"/";try{wasm=yield this.sys.read(candidate+"boot.wasm",{type:"binary"});}
 catch(error){wasm=null;}}
-return{cmd:"boot",wasm:wasm,url:url,origin:candidate};});}}
+this.sys.print(".");return{cmd:"boot",wasm:wasm,url:url,origin:candidate};});}}
 exports.default=CyberTerminal;},{}],4:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class GameInput{constructor(sys){this.sys=sys;this.state={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._listeners=[];this._keyMap=this._getKeyMap();document.addEventListener("keydown",(e)=>{if(this.sys.inputPriority.indexOf("game")>this.sys.inputPriority.indexOf("text"))
 return this.sys.focusInput("text");if(e.altKey&&e.code==="KeyT")
 return this.sys.focusInput("text");let ctrl=this._keyMap[e.code];switch(ctrl){case"left":this.state.axis.x=-1;e.preventDefault();break;case"right":this.state.axis.x=1;e.preventDefault();break;case"up":this.state.axis.y=-1;e.preventDefault();break;case"down":this.state.axis.y=1;e.preventDefault();break;case"a":this.state.buttons.a=true;e.preventDefault();break;case"b":this.state.buttons.b=true;e.preventDefault();break;case"x":this.state.buttons.x=true;e.preventDefault();break;case"y":e.preventDefault();this.state.buttons.y=true;break;}
@@ -179,7 +179,9 @@ exports.default=TextInput;},{}],8:[function(require,module,exports){"use strict"
 function rejected(value){try{step(generator["throw"](value));}catch(e){reject(e);}}
 function step(result){result.done?resolve(result.value):new P(function(resolve){resolve(result.value);}).then(fulfilled,rejected);}
 step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});const css_1=require("./css");const GameInput_1=require("./GameInput");const ChipSound_1=require("./ChipSound");const MouseInput_1=require("./MouseInput");const TextInput_1=require("./TextInput");const Breaker_1=require("./Breaker");let scriptSrc;class WebSys{constructor(){this.inputPriority=["text","mouse","game"];this._container=document.querySelector("fantasy-terminal");this._displayMode="";this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._displayCursorCol=-1;this._displayCursorRow=-1;this._displayTextSize=10;this._displayTextSizeDelta=0;this._displayTextEscape="";this._displayScale=8;let scripts=document.querySelectorAll("script");scriptSrc=scripts[scripts.length-1].src;this._initContainer();this.chipSound=new ChipSound_1.default();this.textInput=new TextInput_1.default(this,this._container.querySelector(".input .text"));this.mouseInput=new MouseInput_1.default(this);this.gameInput=new GameInput_1.default(this);this.breaker=new Breaker_1.default(this);}
-setDisplayMode(mode,width,height,visibleWidth=width,visibleHeight=height){this._displayMode=mode;this._displayWidth=width;this._displayHeight=height;this._visibleWidth=visibleWidth;this._visibleHeight=visibleHeight;delete this._displayBitmap;delete this._displayCanvas;delete this._displayContext;switch(this._displayMode){case"text":this._initTextGrid(width,height);break;case"pixel":this._displayBitmap=new ImageData(width,height);this._initCanvas();break;default:this._displayMode="";this._visibleWidth=-1;this._visibleHeight=-1;throw`DisplayMode ${mode}not supported!`;}
+setTitle(title){}
+setDisplayMode(mode,width,height,visibleWidth=width,visibleHeight=height){if(this._displayMode===mode&&this._displayWidth===width&&this._displayHeight===height&&this._visibleWidth===visibleWidth&&this._visibleHeight===visibleHeight)
+return;this._displayMode=mode;this._displayWidth=width;this._displayHeight=height;this._visibleWidth=visibleWidth;this._visibleHeight=visibleHeight;delete this._displayTextGrid;delete this._displayBitmap;delete this._displayCanvas;delete this._displayContext;switch(this._displayMode){case"text":this._initTextGrid(width,height);break;case"pixel":this._displayBitmap=new ImageData(width,height);this._initCanvas();break;default:this._displayMode="";this._visibleWidth=-1;this._visibleHeight=-1;throw`DisplayMode ${mode}not supported!`;}
 return;}
 drawBitmap(buffer){if(this._displayContext&&this._displayBitmap){let data=new Uint8ClampedArray(buffer);this._displayBitmap.data.set(data,0);this._displayContext.putImageData(this._displayBitmap,0,0);}}
 print(str){if(!this._displayTextGrid)
