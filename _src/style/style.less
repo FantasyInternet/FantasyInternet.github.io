@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Audiowide|Bungee+Hairline|Geostar|Geostar+Fill|Megrim|Monoton|Nova+Square|Plaster|Press+Start+2P|Share+Tech+Mono|VT323');
+@import url('https://fonts.googleapis.com/css?family=Geostar+Fill|Press+Start+2P|VT323|Special+Elite');
 
 @page-width: 48em;
 @import "_reset";
@@ -6,8 +6,10 @@
 @import "_basics";
 
 html {
-  background-image: url("denys-nevozhai-351730-unsplash.jpg");  //Photo by Denys Nevozhai on Unsplash
+  background-color: #123;
+  background-image: url("abstract-3293076_1280.jpg");
   background-size: cover;
+  background-attachment: fixed;
   color:#def;
 }
 
@@ -58,7 +60,7 @@ h1 {
 }
 
 article {
-  background-color: rgba(0,0,0, 0.5);
+  background-color: rgba(0,0,0, 0.75);
   border: .01em solid;
   border-radius: 1em;
   box-shadow: 0 0 1em;
@@ -66,7 +68,7 @@ article {
 }
 
 pre {
-  background-color: rgba(0,0,0, 0.5);
+  background-color: rgba(0,0,0, 0.75);
   color: #eff;
 }
 
@@ -79,5 +81,16 @@ a {
 }
 
 fantasy-terminal {
+  opacity: .75;
   margin: 1em;
+}
+
+footer {
+  background-color: rgba(0,64,128, 0.75);
+  color: #9cf;
+  font-family: "Special Elite";
+  font-size: .8em;
+  margin-top: 1em;
+  text-align: center;
+
 }

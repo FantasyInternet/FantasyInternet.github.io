@@ -1,6 +1,6 @@
 The Fantasy Internet
 ====================
-Website for The Fantasy Internet
+Welcome to cyberspace!
 
 [Download CyberTerminal for Windows!](https://github.com/FantasyInternet/cyberterminal/releases)
 
