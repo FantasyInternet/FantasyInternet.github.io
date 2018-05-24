@@ -1,5 +1,83 @@
+@import url('https://fonts.googleapis.com/css?family=Audiowide|Bungee+Hairline|Geostar|Geostar+Fill|Megrim|Monoton|Nova+Square|Plaster|Press+Start+2P|Share+Tech+Mono|VT323');
+
 @page-width: 48em;
 @import "_reset";
 @msr: 1.125em;
 @import "_basics";
 
+html {
+  background-image: url("denys-nevozhai-351730-unsplash.jpg");  //Photo by Denys Nevozhai on Unsplash
+  background-size: cover;
+  color:#def;
+}
+
+
+header {
+  background-color: rgba(0,64,128, 0.75);
+  border-bottom: .1em solid;
+  box-shadow: 0 0 1em #eff;
+  color:#eff;
+  margin-bottom: 1em;
+
+  h1 {
+    color: inherit;
+    margin: 0 auto;
+    font-family: "Geostar Fill";
+    text-shadow: 0 0 1em;
+  }
+
+  nav {
+    display: table;
+    font-family: "VT323";
+    font-size: 1.5em;
+    width: 100%;
+
+    ul {
+      display: table-row;
+
+      li {
+        display: table-cell;
+        text-align: center;
+        width: 1%;
+
+        a {
+          display: block;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
+
+h1 {
+  font-family: "VT323";
+  font-size: 3em;
+  font-weight: normal;
+  text-transform: none;
+  margin-top: 0;
+}
+
+article {
+  background-color: rgba(0,0,0, 0.5);
+  border: .01em solid;
+  border-radius: 1em;
+  box-shadow: 0 0 1em;
+  font-family: "Press Start 2P";
+}
+
+pre {
+  background-color: rgba(0,0,0, 0.5);
+  color: #eff;
+}
+
+a {
+  color: #eff;
+
+  &:hover {
+    text-shadow: 0 0 1em;
+  }
+}
+
+fantasy-terminal {
+  margin: 1em;
+}

@@ -22,11 +22,16 @@ html
     meta(property="og:type", content="game")
     meta(property="og:image", content=baseUrl+"images/retrowave64.gif")
     link(rel="icon", type="image/png", href="images/icon.png")
-    //link(rel="stylesheet", type="text/css", href="style/defaults.css")
     link(rel="stylesheet", type="text/css", href="style/style.css")
-    base(target="_blank")
   body
     | <!--[if IE]>
     .noscript Sadly this game doesn't run on Internet Explorer.
     | <![endif]-->
+    header
+      h1= appTitle
+      nav: ul
+        li: a(href="./") Overview
+        li: a(href="./about.html") What?
+        li: a(href="./tech.html") How?
     yield
+    footer &nbsp;
