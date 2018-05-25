@@ -79,31 +79,24 @@ getBaseUrl(){return this._pushString(this._baseUrl);}
 setBaseUrl(){let relurl=this._popString();if(this._originUrl){let url=new URL(relurl,this._baseUrl);if(url.toString().substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._baseUrl=url.toString();}
 else{let url=new URL(relurl);this._baseUrl=url.toString();this._originUrl=this._baseUrl.substr(0,this._baseUrl.indexOf(url.pathname)+1);}}
-read(callback){if(typeof callback==="number"){let process=this._processes[this._activePID];if(!process)
-throw"No active process!";callback=process.instance.exports.table.get(callback);}
-let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
-throw"cross origin not allowed!";this._sysRequest("read",filename,{type:"binary"}).then((data)=>{this._pushArrayBuffer(data);callback(data.byteLength,id);});return id;}
-readImage(callback){if(typeof callback==="number"){let process=this._processes[this._activePID];if(!process)
-throw"No active process!";callback=process.instance.exports.table.get(callback);}
-let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
-throw"cross origin not allowed!";this._sysRequest("read",filename,{type:"image"}).then((data)=>{this._pushArrayBuffer(data.data.buffer);callback(data.width,data.height,id);});return id;}
-write(callback){if(typeof callback==="number"){let process=this._processes[this._activePID];if(!process)
-throw"No active process!";callback=process.instance.exports.table.get(callback);}
-let id=this._asyncCalls++;let data=this._popArrayBuffer();let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
-throw"cross origin not allowed!";this._sysRequest("write",filename,data).then((success)=>{callback(success,id);});return id;}
-delete(callback){if(typeof callback==="number"){let process=this._processes[this._activePID];if(!process)
-throw"No active process!";callback=process.instance.exports.table.get(callback);}
-let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
-throw"cross origin not allowed!";this._sysRequest("delete",filename).then((success)=>{callback(success,id);});return id;}
+read(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+throw"cross origin not allowed!";this._sysRequest("read",filename,{type:"binary"}).then((data)=>{this._pushArrayBuffer(data);callback(true,data.byteLength,id);}).catch((err)=>{console.error(err);callback(false,0,id);});return id;}
+readImage(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+throw"cross origin not allowed!";this._sysRequest("read",filename,{type:"image"}).then((data)=>{this._pushArrayBuffer(data.data.buffer);callback(true,data.width,data.height,id);}).catch((err)=>{console.error(err);callback(false,0,0,id);});return id;}
+write(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let data=this._popArrayBuffer();let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+throw"cross origin not allowed!";this._sysRequest("write",filename,data).then((success)=>{callback(success,id);}).catch((err)=>{console.error(err);callback(false,id);});return id;}
+delete(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+throw"cross origin not allowed!";this._sysRequest("delete",filename).then((success)=>{callback(success,id);}).catch((err)=>{console.error(err);callback(false,id);});return id;}
 setStepInterval(milliseconds){this._stepInterval=milliseconds;}
-loadProcess(){let wasm=this._popArrayBuffer();let env=this._processes.length?this._generateProcessApi():this._generateRomApi();let pid=this._processes.length;this._processes.push(null);WebAssembly.instantiate(wasm,{env,Math}).then((process)=>{this._activePID=pid;this._processes[pid]=process;if(process.instance.exports.init)
-process.instance.exports.init();this._nextFrame=this._nextStep=performance.now();if(this._activePID===0)
-this._tick();this._activePID=0;});return pid;}
+loadProcess(){let wasm=this._popArrayBuffer();let env=this._processes.length?this._generateProcessApi():this._generateRomApi();let pid=this._processes.length;this._processes.push(null);WebAssembly.instantiate(wasm,{env,Math}).then((process)=>{this._activePID=pid;this._processes[pid]=process;if(process.instance.exports.init){try{process.instance.exports.init();}
+catch(error){this._die(error);}}
+this._nextFrame=this._nextStep=performance.now();if(this._activePID===0)
+this._tick();this._activePID=0;}).catch((err)=>{this._processes[pid]=false;if(!pid){this._die(err);}});return pid;}
 stepProcess(pid){let oldpid=this._activePID;this._activePID=pid;let process=this._processes[this._activePID];if(process)
 process.instance.export.step(performance.now());this._activePID=oldpid;}
 callbackProcess(pid,tableIndex,...a){let oldpid=this._activePID;this._activePID=pid;let process=this._processes[this._activePID];if(process)
 process.instance.export.table.get(tableIndex)(...a);this._activePID=oldpid;}
-killProcess(pid){this._processes[pid]=null;this._activePID=0;}
+killProcess(pid){this._processes[pid]=false;this._activePID=0;}
 transferMemory(srcPid,srcOffset,length,destPid,destOffset){let srcProcess=this._processes[srcPid];let destProcess=this._processes[destPid];if(!srcProcess)
 throw"No active process!";let ar=new Uint8Array(destProcess.instance.exports.memory.buffer);ar.set(new Uint8Array(srcProcess.instance.exports.memory.buffer.slice(srcOffset,srcOffset+length)),destOffset);this._bufferStack.push(ar.buffer);}
 focusInput(input){this._inputFocus=input;switch(input){case 1:this._sysCall("focusInput","text");break;case 2:this._sysCall("focusInput","mouse");break;case 3:this._sysCall("focusInput","game");break;}}
@@ -127,13 +120,15 @@ stopTone(channel){this._sysCall("stopTone",channel);}
 wabt(){let wast=this._popString();let module=wabt_1.default.parseWat("idunno.wast",wast);return this._pushArrayBuffer(module.toBinary({}).buffer);}
 _tick(){if(!this._active)
 return;let t=performance.now();let process=this._processes[0];if(!process)
-return this._active=false;setTimeout(this._tick.bind(this),this._nextStep-t);let stepped=!(process.instance.exports.step);if(process.instance.exports.step){if(this._stepInterval<=0)
+return this._active=false;setTimeout(this._tick.bind(this),this._nextStep-t);try{let stepped=!(process.instance.exports.step);if(process.instance.exports.step){if(this._stepInterval<=0)
 this._stepInterval=1;while(t>=this._nextStep){process.instance.exports.step(this._nextStep);stepped=true;this._nextStep+=this._stepInterval;}}
 if(this._transferBuffer&&stepped&&process.instance.exports.display){process.instance.exports.display(t);}
 this._nextFrame+=this._frameInterval;}
+catch(error){this._die(error);}}
 _initCom(){self.addEventListener("message",this._onMessage.bind(this));}
 _onMessage(e){switch(e.data.cmd){case"boot":this._active=true;this._pushString(e.data.url);this.setBaseUrl();this._originUrl=e.data.origin;this._pushArrayBuffer(e.data.wasm);this.loadProcess();break;case"suspend":this._active=false;this._mouseInputState.pressed=false;this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};break;case"resume":if(this._displayMode>=0){this.setDisplayMode(this._displayMode,this._displayWidth,this._displayHeight,this._visibleWidth,this._visibleHeight);this._pushString(this._textInputState.text);this.setInputText();this.focusInput(this._inputFocus);}
-this._nextFrame=this._nextStep=performance.now();this._active=true;this._tick();break;case"break":if(this._processes.length&&this._processes[0].instance.exports.break){this._processes[0].instance.exports.break();}
+this._nextFrame=this._nextStep=performance.now();this._active=true;this._tick();break;case"break":if(this._processes[0]&&this._processes[0].instance.exports.break){this._processes[0].instance.exports.break();}
+else{this.shutdown();}
 break;case"imagedata":this._transferBuffer=e.data.buffer;let cb;while(cb=this._pendingCommits.pop())
 cb(this._lastCommit);break;case"response":if(this._pendingRequests[e.data.reqId]){if(e.data.success){this._pendingRequests[e.data.reqId].resolve(e.data.value);}
 else{this._pendingRequests[e.data.reqId].reject(e.data.value);}
@@ -154,7 +149,11 @@ _copyFunction(_fn){return(...a)=>_fn(...a);}
 _pushArrayBuffer(arbuf){this._bufferStack.push(arbuf);return arbuf.byteLength;}
 _popArrayBuffer(){return this._bufferStack.pop();}
 _pushString(str){let enc=new TextEncoder();let buf=enc.encode(str).buffer;this._bufferStack.push(buf);return buf.byteLength;}
-_popString(){let dec=new TextDecoder("utf-8");return dec.decode(this._bufferStack.pop());}}
+_popString(){let dec=new TextDecoder("utf-8");return dec.decode(this._bufferStack.pop());}
+_die(err){this._processes[0]=false;this.setDisplayMode(0,80,20);this._pushString("\n\nError!\n"+err);this.print();}
+_getCallback(callback){if(typeof callback==="number"){let process=this._processes[this._activePID];if(!process)
+throw"No active process!";callback=process.instance.exports.table.get(callback);}
+return callback;}}
 exports.default=Machine;},{"./wabt":10}],6:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class MouseInput{constructor(sys){this.sys=sys;this.state={x:0,y:0,pressed:false};this.scale=1;this._listeners=[];this._element=document.body;}
 set element(val){this._element.removeEventListener("pointermove",this._mouseMove.bind(this));this._element.removeEventListener("pointerdown",this._mouseDown.bind(this));this._element.removeEventListener("pointerup",this._mouseUp.bind(this));this._element=val;this._element.addEventListener("pointermove",this._mouseMove.bind(this));this._element.addEventListener("pointerdown",this._mouseDown.bind(this));this._element.addEventListener("pointerup",this._mouseUp.bind(this));}
 focus(){}
