@@ -14,14 +14,14 @@ function step(result){result.done?resolve(result.value):new P(function(resolve){
 step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});class CyberTerminal{constructor(sys){this.sys=sys;this.machineWorkers=[];this._disconnecting=false;this.sys.textInput.addEventListener(this._onTextInput.bind(this));this.sys.mouseInput.addEventListener(this._onMouseInput.bind(this));this.sys.gameInput.addEventListener(this._onGameInput.bind(this));this.sys.breaker.addEventListener(this._onBreak.bind(this));this.connectTo(location.toString());document.addEventListener("visibilitychange",()=>{if(this.machineWorkers.length){if(document.visibilityState==="visible"){this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
 else{this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});this.sys.chipSound.stopAll();}}});}
 connectTo(url){return __awaiter(this,void 0,void 0,function*(){if(this._connecting)
-return;this.sys.setDisplayMode("text",url.length,4);this.sys.print("Connecting to\n"+url);this._connecting=true;let machine=this.addMachine();let msg=yield this._findBoot(url);if(msg.wasm){this.sys.print(".");this.sys.setTitle(""+msg.url);machine.send(msg);this._connecting=setTimeout(()=>{this._connecting=null;},1024);}
+return;this.sys.setDisplayMode("text",80,20);this.sys.print("\n\nConnecting to "+url);this._connecting=true;let machine=this.addMachine();let msg=yield this._findBoot(url);if(msg.wasm){this.sys.print(".");this.sys.setTitle(""+msg.url);this.sys.setDisplayMode("none",0,0);machine.send(msg);this._connecting=setTimeout(()=>{this._connecting=null;},1024);}
 else if(typeof process!=="undefined"){this.sys.print(".");this._connecting=setTimeout(()=>{this.removeMachine();this._connecting=null;},1024);this.sys.openWeb(url);}
 else if(location.toString()!==url){this.sys.print(".");this.sys.openWeb(url);}
 else{this.sys.print("!\n");this.sys.print("could not load boot.wasm!");}});}
 addMachine(){if(this.machineWorkers.length)
 this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});let machine=this.sys.createMachine();this.machineWorkers.push(machine);machine.onMessage(this._onMessage.bind(this));this.sys.textInput.setState({text:"",pos:0,len:0});this.sys.chipSound.stopAll();return machine;}
 removeMachine(){let machine=this.machineWorkers.pop();if(machine)
-machine.terminate();this.sys.setDisplayMode("text",16,4);this.sys.print("Disconnecting...");setTimeout(()=>{if(this.machineWorkers.length){this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
+machine.terminate();this.sys.setDisplayMode("text",80,20);this.sys.print("\n\nDisconnecting...");setTimeout(()=>{if(this.machineWorkers.length){this.sys.setDisplayMode("none",0,0);this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
 else{if(history.length>1){history.back();}
 else{location.reload(true);}}},128);this.sys.textInput.setState({text:"",pos:0,len:0});this.sys.chipSound.stopAll();}
 _onMessage(message,machineWorker){switch(message.cmd){case"call":let value;try{message.success=true;if(this[message.method]){value=this[message.method].apply(this,message.arguments);}
@@ -59,7 +59,7 @@ removeEventListener(fn){let i=this._listeners.indexOf(fn);if(i>=0){this._listene
 _sendState(){let newState=JSON.stringify(this.state);if(this._lastState!==newState){this._lastState=newState;this._listeners.forEach((fn)=>{fn(this.state);});}}
 _getKeyMap(){let map={},ctrls={"left":["ArrowLeft","KeyA"],"right":["ArrowRight","KeyD"],"up":["ArrowUp","KeyW","KeyP"],"down":["ArrowDown","KeyS","KeyL"],"a":["KeyA","KeyK","KeyV","Enter"],"b":["KeyB","KeyS","KeyO","Space"],"x":["KeyX","KeyE","Backspace"],"y":["KeyY","KeyZ","KeyC"]};for(let ctrl in ctrls){let codes=ctrls[ctrl];for(let code of codes){map[code]=ctrl;}}
 return map;}}
-exports.default=GameInput;},{}],5:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});const wabt_1=require("./wabt");class Machine{constructor(){this._active=false;this._nextFrame=performance.now();this._frameInterval=1000/60;this._nextUpdate=performance.now();this._updateInterval=1000/60;this._toneTypes=["square","sawtooth","triangle","sine"];this._displayModes=["text","pixel"];this._displayMode=-1;this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._transferBuffer=new ArrayBuffer(8);this._lastCommit=performance.now();this._pendingCommits=[];this._pendingRequests=[];this._baseUrl="";this._originUrl="";this._processes=[];this._activePID=-1;this._bufferStack=[];this._asyncCalls=0;this._inputFocus=-1;this._textInputState={text:"",pos:0,len:0};this._mouseInputState={x:0,y:0,pressed:false};this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._initCom();}
+exports.default=GameInput;},{}],5:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});const wabt_1=require("./wabt");class Machine{constructor(){this._active=false;this._nextFrame=performance.now();this._frameInterval=1000/60;this._nextStep=performance.now();this._stepInterval=1000/60;this._toneTypes=["square","sawtooth","triangle","sine"];this._displayModes=["text","pixel"];this._displayMode=-1;this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._transferBuffer=new ArrayBuffer(8);this._lastCommit=performance.now();this._pendingCommits=[];this._pendingRequests=[];this._baseUrl="";this._originUrl="";this._processes=[];this._activePID=-1;this._bufferStack=[];this._asyncCalls=0;this._inputFocus=-1;this._textInputState={text:"",pos:0,len:0};this._mouseInputState={x:0,y:0,pressed:false};this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._initCom();}
 log(){console.log("📟",this._popString());}
 setDisplayMode(mode,width,height,visibleWidth=width,visibleHeight=height){this._sysCall("setDisplayMode",this._displayModes[mode],width,height,visibleWidth,visibleHeight);this._displayMode=mode;this._displayWidth=width;this._displayHeight=height;this._visibleWidth=visibleWidth;this._visibleHeight=visibleHeight;switch(this._displayModes[this._displayMode]){case"text":break;case"pixel":break;default:this._displayMode=-1;this._visibleWidth=-1;this._visibleHeight=-1;throw"DisplayMode not supported!";}
 return;}
@@ -95,12 +95,12 @@ delete(callback){if(typeof callback==="number"){let process=this._processes[this
 throw"No active process!";callback=process.instance.exports.table.get(callback);}
 let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("delete",filename).then((success)=>{callback(success,id);});return id;}
-setUpdateInterval(milliseconds){this._updateInterval=milliseconds;}
-loadProcess(){let wasm=this._popArrayBuffer();let api=this._processes.length?this._generateProcessApi():this._generateRomApi();let pid=this._processes.length;this._processes.push(null);WebAssembly.instantiate(wasm,{api,Math}).then((process)=>{this._activePID=pid;this._processes[pid]=process;if(process.instance.exports.setup)
-process.instance.exports.setup();this._nextFrame=this._nextUpdate=performance.now();if(this._activePID===0)
+setStepInterval(milliseconds){this._stepInterval=milliseconds;}
+loadProcess(){let wasm=this._popArrayBuffer();let env=this._processes.length?this._generateProcessApi():this._generateRomApi();let pid=this._processes.length;this._processes.push(null);WebAssembly.instantiate(wasm,{env,Math}).then((process)=>{this._activePID=pid;this._processes[pid]=process;if(process.instance.exports.init)
+process.instance.exports.init();this._nextFrame=this._nextStep=performance.now();if(this._activePID===0)
 this._tick();this._activePID=0;});return pid;}
-updateProcess(pid){let oldpid=this._activePID;this._activePID=pid;let process=this._processes[this._activePID];if(process)
-process.instance.export.update(performance.now());this._activePID=oldpid;}
+stepProcess(pid){let oldpid=this._activePID;this._activePID=pid;let process=this._processes[this._activePID];if(process)
+process.instance.export.step(performance.now());this._activePID=oldpid;}
 callbackProcess(pid,tableIndex,...a){let oldpid=this._activePID;this._activePID=pid;let process=this._processes[this._activePID];if(process)
 process.instance.export.table.get(tableIndex)(...a);this._activePID=oldpid;}
 killProcess(pid){this._processes[pid]=null;this._activePID=0;}
@@ -127,13 +127,13 @@ stopTone(channel){this._sysCall("stopTone",channel);}
 wabt(){let wast=this._popString();let module=wabt_1.default.parseWat("idunno.wast",wast);return this._pushArrayBuffer(module.toBinary({}).buffer);}
 _tick(){if(!this._active)
 return;let t=performance.now();let process=this._processes[0];if(!process)
-return this._active=false;setTimeout(this._tick.bind(this),this._nextUpdate-t);let updated=!(process.instance.exports.update);if(t>=this._nextUpdate&&process.instance.exports.update){if(this._updateInterval<=0)
-this._updateInterval=1;while(t>=this._nextUpdate){process.instance.exports.update(this._nextUpdate);updated=true;this._nextUpdate+=this._updateInterval;}}
-if(this._transferBuffer&&updated&&process.instance.exports.draw){process.instance.exports.draw(t);}
+return this._active=false;setTimeout(this._tick.bind(this),this._nextStep-t);let stepped=!(process.instance.exports.step);if(process.instance.exports.step){if(this._stepInterval<=0)
+this._stepInterval=1;while(t>=this._nextStep){process.instance.exports.step(this._nextStep);stepped=true;this._nextStep+=this._stepInterval;}}
+if(this._transferBuffer&&stepped&&process.instance.exports.display){process.instance.exports.display(t);}
 this._nextFrame+=this._frameInterval;}
 _initCom(){self.addEventListener("message",this._onMessage.bind(this));}
 _onMessage(e){switch(e.data.cmd){case"boot":this._active=true;this._pushString(e.data.url);this.setBaseUrl();this._originUrl=e.data.origin;this._pushArrayBuffer(e.data.wasm);this.loadProcess();break;case"suspend":this._active=false;this._mouseInputState.pressed=false;this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};break;case"resume":if(this._displayMode>=0){this.setDisplayMode(this._displayMode,this._displayWidth,this._displayHeight,this._visibleWidth,this._visibleHeight);this._pushString(this._textInputState.text);this.setInputText();this.focusInput(this._inputFocus);}
-this._nextFrame=this._nextUpdate=performance.now();this._active=true;this._tick();break;case"break":if(this._processes.length&&this._processes[0].instance.exports.break){this._processes[0].instance.exports.break();}
+this._nextFrame=this._nextStep=performance.now();this._active=true;this._tick();break;case"break":if(this._processes.length&&this._processes[0].instance.exports.break){this._processes[0].instance.exports.break();}
 break;case"imagedata":this._transferBuffer=e.data.buffer;let cb;while(cb=this._pendingCommits.pop())
 cb(this._lastCommit);break;case"response":if(this._pendingRequests[e.data.reqId]){if(e.data.success){this._pendingRequests[e.data.reqId].resolve(e.data.value);}
 else{this._pendingRequests[e.data.reqId].reject(e.data.value);}
@@ -181,7 +181,7 @@ function step(result){result.done?resolve(result.value):new P(function(resolve){
 step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});const css_1=require("./css");const GameInput_1=require("./GameInput");const ChipSound_1=require("./ChipSound");const MouseInput_1=require("./MouseInput");const TextInput_1=require("./TextInput");const Breaker_1=require("./Breaker");let scriptSrc;class WebSys{constructor(){this.inputPriority=["text","mouse","game"];this._container=document.querySelector("fantasy-terminal");this._displayMode="";this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._displayCursorCol=-1;this._displayCursorRow=-1;this._displayTextSize=10;this._displayTextSizeDelta=0;this._displayTextEscape="";this._displayScale=8;let scripts=document.querySelectorAll("script");scriptSrc=scripts[scripts.length-1].src;this._initContainer();this.chipSound=new ChipSound_1.default();this.textInput=new TextInput_1.default(this,this._container.querySelector(".input .text"));this.mouseInput=new MouseInput_1.default(this);this.gameInput=new GameInput_1.default(this);this.breaker=new Breaker_1.default(this);}
 setTitle(title){}
 setDisplayMode(mode,width,height,visibleWidth=width,visibleHeight=height){if(this._displayMode===mode&&this._displayWidth===width&&this._displayHeight===height&&this._visibleWidth===visibleWidth&&this._visibleHeight===visibleHeight)
-return;this._displayMode=mode;this._displayWidth=width;this._displayHeight=height;this._visibleWidth=visibleWidth;this._visibleHeight=visibleHeight;delete this._displayTextGrid;delete this._displayBitmap;delete this._displayCanvas;delete this._displayContext;switch(this._displayMode){case"text":this._initTextGrid(width,height);break;case"pixel":this._displayBitmap=new ImageData(width,height);this._initCanvas();break;default:this._displayMode="";this._visibleWidth=-1;this._visibleHeight=-1;throw`DisplayMode ${mode}not supported!`;}
+return;this._displayMode=mode;this._displayWidth=width;this._displayHeight=height;this._visibleWidth=visibleWidth;this._visibleHeight=visibleHeight;delete this._displayTextGrid;delete this._displayBitmap;delete this._displayCanvas;delete this._displayContext;switch(this._displayMode){case"none":break;case"text":this._initTextGrid(width,height);break;case"pixel":this._displayBitmap=new ImageData(width,height);this._initCanvas();break;default:this._displayMode="";this._visibleWidth=-1;this._visibleHeight=-1;throw`DisplayMode ${mode}not supported!`;}
 return;}
 drawBitmap(buffer){if(this._displayContext&&this._displayBitmap){let data=new Uint8ClampedArray(buffer);this._displayBitmap.data.set(data,0);this._displayContext.putImageData(this._displayBitmap,0,0);}}
 print(str){if(!this._displayTextGrid)
