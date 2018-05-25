@@ -5,7 +5,7 @@ The fantasy internet is a reinvention and re-imagining of the web. It is the cyb
 
 What would the internet look like, had it been introduced on the good ol' microcomputers of the eighties..?
 
-What if HTML, CSS and JavaScript was never invented?
+What if HTML was never invented?
 
 What would a world wide network of arcade machines look like?
 
