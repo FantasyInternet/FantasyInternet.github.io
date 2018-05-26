@@ -8,9 +8,14 @@
 html {
   background-color: #123;
   background-image: url("abstract-3293076_1280.jpg");
+  background-position: center;
   background-size: cover;
   background-attachment: fixed;
   color:#def;
+
+  @media screen and (max-width: 42em) {
+    font-size: 3vw;
+  }
 }
 
 
@@ -55,8 +60,9 @@ h1 {
   font-family: "VT323";
   font-size: 3em;
   font-weight: normal;
-  text-transform: none;
+  line-height: 1em;
   margin-top: 0;
+  text-transform: none;
 }
 
 article {
@@ -66,7 +72,7 @@ article {
   box-shadow: 0 0 1em;
   font-family: "Press Start 2P";
 
-  min-height: calc(100vh - 9.333333333em);
+  min-height: calc(100vh - 8.2em);
 }
 
 pre {
