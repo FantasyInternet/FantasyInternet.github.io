@@ -24,7 +24,7 @@ let os = require("os"),
 *
 * @date 11-may-2018
 */
-let srcDir = "./_src/",
+let srcDir = "./src/",
   outDir = "./",
   staticFiles = null,
   debug = false,

@@ -108,10 +108,10 @@
   (memory $memory 1)
     (export "memory" (memory $memory))
     (data (i32.const 0xf100) "./README.md");;11
-    (data (i32.const 0xf200) "./_src/about.md");;15
-    (data (i32.const 0xf300) "./_src/tech.md");;14
-    (data (i32.const 0xf400) "./_src/download.md");;18
-    (data (i32.const 0xf500) "./_src/boot.wast");;16
+    (data (i32.const 0xf200) "./src/about.md");;14
+    (data (i32.const 0xf300) "./src/tech.md");;13
+    (data (i32.const 0xf400) "./src/download.md");;17
+    (data (i32.const 0xf500) "./src/boot.wast");;15
     (data (i32.const 0xff00) "./images/pointer.png");;20
 
   ;; Global variables
@@ -141,22 +141,22 @@
       (if (i32.eq (get_local $req) (get_global $readmeReq)) (then
         (set_global $readme (call $createPart (get_local $len)))
         (call $popToMemory (call $getPartOffset (get_global $readme)))
-        (set_global $aboutReq     (call $read (call $pushFromMemory (i32.const 0xf200) (i32.const 15)) (i32.const 1)))
+        (set_global $aboutReq     (call $read (call $pushFromMemory (i32.const 0xf200) (i32.const 14)) (i32.const 1)))
       ))
       (if (i32.eq (get_local $req) (get_global $aboutReq)) (then
         (set_global $about (call $createPart (get_local $len)))
         (call $popToMemory (call $getPartOffset (get_global $about)))
-        (set_global $techReq      (call $read (call $pushFromMemory (i32.const 0xf300) (i32.const 14)) (i32.const 1)))
+        (set_global $techReq      (call $read (call $pushFromMemory (i32.const 0xf300) (i32.const 13)) (i32.const 1)))
       ))
       (if (i32.eq (get_local $req) (get_global $techReq)) (then
         (set_global $tech (call $createPart (get_local $len)))
         (call $popToMemory (call $getPartOffset (get_global $tech)))
-        (set_global $downloadReq  (call $read (call $pushFromMemory (i32.const 0xf400) (i32.const 18)) (i32.const 1)))
+        (set_global $downloadReq  (call $read (call $pushFromMemory (i32.const 0xf400) (i32.const 17)) (i32.const 1)))
       ))
       (if (i32.eq (get_local $req) (get_global $downloadReq)) (then
         (set_global $download (call $createPart (get_local $len)))
         (call $popToMemory (call $getPartOffset (get_global $download)))
-        ;; (set_global $bootwastReq  (call $read (call $pushFromMemory (i32.const 0xf500) (i32.const 16)) (i32.const 1)))
+        (set_global $bootwastReq  (call $read (call $pushFromMemory (i32.const 0xf500) (i32.const 15)) (i32.const 1)))
       ))
       (if (i32.eq (get_local $req) (get_global $bootwastReq)) (then
         (set_global $bootwast (call $createPart (get_local $len)))
