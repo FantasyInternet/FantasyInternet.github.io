@@ -107,28 +107,63 @@
   ;; Linear memory.
   (memory $memory 1)
     (export "memory" (memory $memory))
-    (data (i32.const 100) "./README.md")
-    (data (i32.const 200) "./images/pointer.png")
+    (data (i32.const 0xf100) "./README.md");;11
+    (data (i32.const 0xf200) "./_src/about.md");;15
+    (data (i32.const 0xf300) "./_src/tech.md");;14
+    (data (i32.const 0xf400) "./_src/download.md");;18
+    (data (i32.const 0xf500) "./_src/boot.wast");;16
+    (data (i32.const 0xff00) "./images/pointer.png");;20
 
   ;; Global variables
-  (global $readme (mut i32) (i32.const 0))
-  (global $pos    (mut i32) (i32.const 0))
-  (global $font   (mut i32) (i32.const 0))
+  (global $readme       (mut i32) (i32.const -1))
+  (global $readmeReq    (mut i32) (i32.const -1))
+  (global $about        (mut i32) (i32.const -1))
+  (global $aboutReq     (mut i32) (i32.const -1))
+  (global $tech         (mut i32) (i32.const -1))
+  (global $techReq      (mut i32) (i32.const -1))
+  (global $download     (mut i32) (i32.const -1))
+  (global $downloadReq  (mut i32) (i32.const -1))
+  (global $bootwast     (mut i32) (i32.const -1))
+  (global $bootwastReq  (mut i32) (i32.const -1))
+  (global $pos          (mut i32) (i32.const -1))
+  (global $font         (mut i32) (i32.const -1))
 
   ;; Init function is called once on start.
   (func $init
-    (call $setStepInterval (i32.const 128))
+    (call $setStepInterval (i32.const 64))
     (call $setDisplayMode (i32.const 0) (i32.const 80) (i32.const 20) (i32.const 80) (i32.const 20))
-    (call $read (call $pushFromMemory (i32.const 100) (i32.const 11)) (i32.const 1))
-    ;;(call $focusInput (i32.const 3))
-    (return)
+    (set_global $readmeReq    (call $read (call $pushFromMemory (i32.const 0xf100) (i32.const 11)) (i32.const 1)))
   )
   (export "init" (func $init))
 
   (func $loadReadme (param $success i32) (param $len i32) (param $req i32)
     (if (get_local $success) (then
-      (set_global $readme (call $createPart (get_local $len)))
-      (call $popToMemory (call $getPartOffset (get_global $readme)))
+      (if (i32.eq (get_local $req) (get_global $readmeReq)) (then
+        (set_global $readme (call $createPart (get_local $len)))
+        (call $popToMemory (call $getPartOffset (get_global $readme)))
+        (set_global $aboutReq     (call $read (call $pushFromMemory (i32.const 0xf200) (i32.const 15)) (i32.const 1)))
+      ))
+      (if (i32.eq (get_local $req) (get_global $aboutReq)) (then
+        (set_global $about (call $createPart (get_local $len)))
+        (call $popToMemory (call $getPartOffset (get_global $about)))
+        (set_global $techReq      (call $read (call $pushFromMemory (i32.const 0xf300) (i32.const 14)) (i32.const 1)))
+      ))
+      (if (i32.eq (get_local $req) (get_global $techReq)) (then
+        (set_global $tech (call $createPart (get_local $len)))
+        (call $popToMemory (call $getPartOffset (get_global $tech)))
+        (set_global $downloadReq  (call $read (call $pushFromMemory (i32.const 0xf400) (i32.const 18)) (i32.const 1)))
+      ))
+      (if (i32.eq (get_local $req) (get_global $downloadReq)) (then
+        (set_global $download (call $createPart (get_local $len)))
+        (call $popToMemory (call $getPartOffset (get_global $download)))
+        (set_global $bootwastReq  (call $read (call $pushFromMemory (i32.const 0xf500) (i32.const 16)) (i32.const 1)))
+      ))
+      (if (i32.eq (get_local $req) (get_global $bootwastReq)) (then
+        (set_global $bootwast (call $createPart (get_local $len)))
+        (call $popToMemory (call $getPartOffset (get_global $bootwast)))
+        ;;(set_global $bootwastReq  (call $read (call $pushFromMemory (i32.const 0xf600) (i32.const 16)) (i32.const 1)))
+      ))
+      (set_global $pos (i32.const 0))
     )(else
       (call $shutdown)
     ))
@@ -136,10 +171,14 @@
 
   ;; Step function is called once every interval.
   (func $step (param $t f64)
-    (if (i32.and (get_global $readme) (i32.lt_u (get_global $pos) (call $getPartLength (get_global $readme)))) (then
-      (call $print (call $pushFromMemory (i32.add (call $getPartOffset (get_global $readme)) (get_global $pos)) (i32.const 1)))
-      (set_global $pos (i32.add (get_global $pos) (i32.const 1)))
-    ))
+    ;; (if (i32.and (get_global $readme) (i32.lt_u (get_global $pos) (call $getPartLength (get_global $readme)))) (then
+      (loop
+        (set_global $pos (i32.add (get_global $pos) (i32.const 1)))
+        (br_if 0 (i32.eq (i32.load8_u (get_global $pos)) (i32.const 0)))
+      )
+      (call $print (call $pushFromMemory (get_global $pos) (i32.const 1)))
+      ;; (set_global $pos (i32.add (get_global $pos) (i32.const 1)))
+    ;; ))
   )
   (export "step" (func $step))
 
