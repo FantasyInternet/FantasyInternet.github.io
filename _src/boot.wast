@@ -156,7 +156,7 @@
       (if (i32.eq (get_local $req) (get_global $downloadReq)) (then
         (set_global $download (call $createPart (get_local $len)))
         (call $popToMemory (call $getPartOffset (get_global $download)))
-        (set_global $bootwastReq  (call $read (call $pushFromMemory (i32.const 0xf500) (i32.const 16)) (i32.const 1)))
+        ;; (set_global $bootwastReq  (call $read (call $pushFromMemory (i32.const 0xf500) (i32.const 16)) (i32.const 1)))
       ))
       (if (i32.eq (get_local $req) (get_global $bootwastReq)) (then
         (set_global $bootwast (call $createPart (get_local $len)))
