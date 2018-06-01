@@ -1,4 +1,4 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){module.exports={"name":"cyberterminal","version":"0.0.96","description":"A fantasy internet client","author":{"name":"codeartisticninja","url":"http://codeartistic.ninja/"},"private":true,"build":{"appId":"ninja.codeartistic","nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true},"win":{"target":["nsis","portable"],"icon":"images/icon.png"},"mac":{"category":"your.app.category.type"},"directories":{"app":"./build/","output":"./build-desktop/"}},"scripts":{"prepublish":"jake","build":"jake","build-desktop":"electron-builder","deploy":"jake deploy","start":"statify -d ./build/","watch":"jake watch"},"devDependencies":{"@types/electron":"^1.6.10","browserify":"^16.2.0","cssmin":"^0.4.3","electron-builder":"^20.10.0","file-watch":"^0.1.0","ftp":"^0.3.10","htmlmin":"0.0.7","jake":"^8.0.16","jsmin":"^1.0.1","jstransformer-markdown-it":"^2.1.0","less":"^3.0.2","livereload":"^0.7.0","md5":"^2.2.1","pug":"^2.0.3","tsify":"^4.0.0","typedoc":"^0.11.1","typedoc-plugin-markdown":"^1.1.6","typescript":"^2.8.3","wabt":"^1.0.0","walt-compiler":"^0.4.3"},"dependencies":{"statify":"^2.0.1"}}},{}],2:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class Breaker{constructor(sys){this.sys=sys;this.state={level:0};this._listeners=[];document.addEventListener("keydown",(e)=>{if(e.code==="Escape"&&this.state.level===0){this.state.level=1;this._sendState();setTimeout(()=>{if(this.state.level===1){this.state.level=2;this._sendState();}},1024);}});document.addEventListener("keyup",(e)=>{if(e.code==="Escape"){this.state.level=0;this._sendState();}});}
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){module.exports={"name":"cyberterminal","version":"0.0.98","description":"A fantasy internet client","author":{"name":"codeartisticninja","url":"http://codeartistic.ninja/"},"private":true,"build":{"appId":"ninja.codeartistic","nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true},"win":{"target":["nsis","portable"],"icon":"images/icon.png"},"mac":{"category":"your.app.category.type"},"directories":{"app":"./build/","output":"./build-desktop/"}},"scripts":{"prepublish":"jake","build":"jake","build-desktop":"electron-builder","deploy":"jake deploy","start":"statify -d ./build/","watch":"jake watch"},"devDependencies":{"@types/electron":"^1.6.10","browserify":"^16.2.0","cssmin":"^0.4.3","electron-builder":"^20.10.0","file-watch":"^0.1.0","ftp":"^0.3.10","htmlmin":"0.0.7","jake":"^8.0.16","jsmin":"^1.0.1","jstransformer-markdown-it":"^2.1.0","less":"^3.0.2","livereload":"^0.7.0","md5":"^2.2.1","pug":"^2.0.3","tsify":"^4.0.0","typedoc":"^0.11.1","typedoc-plugin-markdown":"^1.1.6","typescript":"^2.8.3","wabt":"^1.0.0","walt-compiler":"^0.4.3"},"dependencies":{"statify":"^2.0.1"}}},{}],2:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class Breaker{constructor(sys){this.sys=sys;this.state={level:0};this._listeners=[];document.addEventListener("keydown",(e)=>{if(e.code==="Escape"&&this.state.level===0){this.state.level=1;this._sendState();setTimeout(()=>{if(this.state.level===1){this.state.level=2;this._sendState();}},1024);}});document.addEventListener("keyup",(e)=>{if(e.code==="Escape"){this.state.level=0;this._sendState();}});}
 addEventListener(fn){let i=this._listeners.indexOf(fn);if(i<0){this._listeners.push(fn);}}
 removeEventListener(fn){let i=this._listeners.indexOf(fn);if(i>=0){this._listeners.splice(i,1);}}
 _sendState(){let newState=JSON.stringify(this.state);if(this._lastState!==newState){this._lastState=newState;this._listeners.forEach((fn)=>{fn(this.state);});}}}
@@ -11,7 +11,7 @@ stopAll(){for(let i=0;i<this._channels.length;i++){this.stopTone(i);}}}
 exports.default=ChipSound;},{}],4:[function(require,module,exports){"use strict";var __awaiter=(this&&this.__awaiter)||function(thisArg,_arguments,P,generator){return new(P||(P=Promise))(function(resolve,reject){function fulfilled(value){try{step(generator.next(value));}catch(e){reject(e);}}
 function rejected(value){try{step(generator["throw"](value));}catch(e){reject(e);}}
 function step(result){result.done?resolve(result.value):new P(function(resolve){resolve(result.value);}).then(fulfilled,rejected);}
-step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});let pkg=require("../../../package.json");class CyberTerminal{constructor(sys){this.sys=sys;this.machineWorkers=[];this._disconnecting=false;this.sys.textInput.addEventListener(this._onTextInput.bind(this));this.sys.mouseInput.addEventListener(this._onMouseInput.bind(this));this.sys.gameInput.addEventListener(this._onGameInput.bind(this));this.sys.breaker.addEventListener(this._onBreak.bind(this));this.sys.setDisplayMode("text",80,20);this.sys.print("CyberTerminal v"+pkg.version);setTimeout(()=>{this.connectTo(location.toString());},1024);document.addEventListener("visibilitychange",()=>{if(this.machineWorkers.length){if(document.visibilityState==="visible"){this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
+step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});let pkg=require("../../../package.json");class CyberTerminal{constructor(sys){this.sys=sys;this.machineWorkers=[];this._disconnecting=false;this.sys.textInput.addEventListener(this._onTextInput.bind(this));this.sys.mouseInput.addEventListener(this._onMouseInput.bind(this));this.sys.gameInput.addEventListener(this._onGameInput.bind(this));this.sys.breaker.addEventListener(this._onBreak.bind(this));this.sys.setDisplayMode("text",80,20);this.sys.print("CyberTerminal v"+pkg.version);setTimeout(()=>{this.sys.startTone(0,512);setTimeout(()=>{this.connectTo(location.toString());},256);},1024);document.addEventListener("visibilitychange",()=>{if(this.machineWorkers.length){if(document.visibilityState==="visible"){this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
 else{this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});this.sys.chipSound.stopAll();}}});}
 connectTo(url){return __awaiter(this,void 0,void 0,function*(){if(this._connecting)
 return;this.sys.setDisplayMode("text",80,20);this.sys.print("\n\nConnecting to "+url);this._connecting=true;let machine=this.addMachine();let msg=yield this._findBoot(url);if(msg.wasm){this.sys.print(".");this.sys.setTitle(""+msg.url);this.sys.setDisplayMode("none",0,0);machine.send(msg);this._connecting=setTimeout(()=>{this._connecting=null;},1024);}
@@ -19,11 +19,11 @@ else if(typeof process!=="undefined"){this.sys.print(".");this._connecting=setTi
 else if(location.toString()!==url){this.sys.print(".");this.sys.openWeb(url);}
 else{this.sys.print("!\n");this.sys.print("could not load boot.wasm!");}});}
 addMachine(){if(this.machineWorkers.length)
-this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});let machine=this.sys.createMachine();this.machineWorkers.push(machine);machine.onMessage(this._onMessage.bind(this));this.sys.textInput.setState({text:"",pos:0,len:0});this.sys.chipSound.stopAll();return machine;}
+this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});let machine=this.sys.createMachine();this.machineWorkers.push(machine);machine.onMessage(this._onMessage.bind(this));this.sys.textInput.setState({type:"multiline",text:"",pos:0,len:0});this.sys.chipSound.stopAll();return machine;}
 removeMachine(){let machine=this.machineWorkers.pop();if(machine)
 machine.terminate();this.sys.setDisplayMode("text",80,20);this.sys.print("\n\nDisconnecting...");setTimeout(()=>{if(this.machineWorkers.length){this.sys.setDisplayMode("none",0,0);this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
 else{if(history.length>1){history.back();}
-else{location.reload(true);}}},128);this.sys.textInput.setState({text:"",pos:0,len:0});this.sys.chipSound.stopAll();}
+else{location.reload(true);}}},128);this.sys.textInput.setState({type:"multiline",text:"",pos:0,len:0});this.sys.chipSound.stopAll();}
 _onMessage(message,machineWorker){switch(message.cmd){case"call":let value;try{message.success=true;if(this[message.method]){value=this[message.method].apply(this,message.arguments);}
 else{value=this.sys[message.method].apply(this.sys,message.arguments);}}
 catch(error){message.success=false;value=error;}
@@ -41,7 +41,7 @@ _onBreak(state){if(state.level===0&&this._disconnecting){this.sys.stopTone(0);th
 else if(state.level===1){let msg={cmd:"break",state:state};if(!this.machineWorkers.length)
 return;this.machineWorkers[this.machineWorkers.length-1].send(msg);}
 else if(state.level===2){if(!this.machineWorkers.length)
-return;this.machineWorkers[this.machineWorkers.length-1].terminate();this.sys.startTone(0,256,1,"square");setTimeout(()=>{this.sys.stopTone(0);},128);this._disconnecting=true;}}
+return;this.machineWorkers[this.machineWorkers.length-1].terminate();this.sys.startTone(0,256);setTimeout(()=>{this.sys.stopTone(0);},128);this._disconnecting=true;}}
 _findBoot(url){return __awaiter(this,void 0,void 0,function*(){this.sys.print(".");if(url.substr(0,5)!=="file:"){try{url=(yield fetch(url)).url;}
 catch(error){return{};}}
 let parts=url.split("/");let candidate=parts.shift()+"/"+parts.shift()+"/";let wasm=null;while(parts.length&&!wasm){this.sys.print(".");candidate+=parts.shift()+"/";try{wasm=yield this.sys.read(candidate+"boot.wasm",{type:"binary"});}
@@ -59,7 +59,7 @@ removeEventListener(fn){let i=this._listeners.indexOf(fn);if(i>=0){this._listene
 _sendState(){let newState=JSON.stringify(this.state);if(this._lastState!==newState){this._lastState=newState;this._listeners.forEach((fn)=>{fn(this.state);});}}
 _getKeyMap(){let map={},ctrls={"left":["ArrowLeft","KeyA"],"right":["ArrowRight","KeyD"],"up":["ArrowUp","KeyW","KeyP"],"down":["ArrowDown","KeyS","KeyL"],"a":["KeyA","KeyK","KeyV","Enter"],"b":["KeyB","KeyS","KeyO","Space"],"x":["KeyX","KeyE","Backspace"],"y":["KeyY","KeyZ","KeyC"]};for(let ctrl in ctrls){let codes=ctrls[ctrl];for(let code of codes){map[code]=ctrl;}}
 return map;}}
-exports.default=GameInput;},{}],6:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var wabt=require("./wabt");class Machine{constructor(){this._active=false;this._nextFrame=performance.now();this._frameInterval=1000/60;this._nextStep=performance.now();this._stepInterval=1000/60;this._toneTypes=["square","sawtooth","triangle","sine"];this._displayModes=["text","pixel"];this._displayMode=-1;this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._transferBuffer=new ArrayBuffer(8);this._lastCommit=performance.now();this._pendingCommits=[];this._pendingRequests=[];this._baseUrl="";this._originUrl="";this._processes=[];this._activePID=-1;this._bufferStack=[];this._asyncCalls=0;this._inputFocus=-1;this._textInputState={text:"",pos:0,len:0,key:0};this._keyBuffer=[0];this._mouseInputState={x:0,y:0,pressed:false};this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._initCom();}
+exports.default=GameInput;},{}],6:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var wabt=require("./wabt");class Machine{constructor(){this._active=false;this._nextFrame=performance.now();this._frameInterval=1000/60;this._nextStep=performance.now();this._stepInterval=1000/60;this._toneTypes=["square","sawtooth","triangle","sine"];this._displayModes=["text","pixel"];this._displayMode=-1;this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._transferBuffer=new ArrayBuffer(8);this._lastCommit=performance.now();this._pendingCommits=[];this._pendingRequests=[];this._baseUrl="";this._originUrl="";this._processes=[];this._activePID=-1;this._bufferStack=new Uint8Array(1024);this._bufferStackLengths=[];this._asyncCalls=0;this._inputFocus=-1;this._textInputState={type:0,text:"",pos:0,len:0,key:0};this._keyBuffer=[0];this._inputTypes=["multiline","text","password","number","url","email","tel"];this._mouseInputState={x:0,y:0,pressed:false};this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._initCom();}
 log(){console.log("📟",this._popString());}
 setDisplayMode(mode,width,height,visibleWidth=width,visibleHeight=height){this._sysCall("setDisplayMode",this._displayModes[mode],width,height,visibleWidth,visibleHeight);this._displayMode=mode;this._displayWidth=width;this._displayHeight=height;this._visibleWidth=visibleWidth;this._visibleHeight=visibleHeight;switch(this._displayModes[this._displayMode]){case"text":break;case"pixel":break;default:this._displayMode=-1;this._visibleWidth=-1;this._visibleHeight=-1;throw"DisplayMode not supported!";}
 return;}
@@ -69,10 +69,10 @@ throw"No active process!";let buffer;if(this._transferBuffer&&this._transferBuff
 else{console.warn("Creating new _transferBuffer");buffer=new ArrayBuffer(this._displayWidth*this._displayHeight*4);}
 let data=new Uint8ClampedArray(buffer);data.set(new Uint8Array(process.instance.exports.memory.buffer.slice(offset,offset+length)),destination);postMessage({cmd:"imagedata",width:this._displayWidth,height:this._displayHeight,buffer:buffer},[buffer]);this._lastCommit=performance.now();}
 pushFromMemory(offset,length){let process=this._processes[this._activePID];if(!process)
-throw"No active process!";let ar=new Uint8Array(length);ar.set(new Uint8Array(process.instance.exports.memory.buffer.slice(offset,offset+length)));this._bufferStack.push(ar.buffer);}
+throw"No active process!";let ar=new Uint8Array(length);ar.set(new Uint8Array(process.instance.exports.memory.buffer.slice(offset,offset+length)));return this._pushArrayBuffer(ar.buffer);}
 popToMemory(offset){let process=this._processes[this._activePID];if(!process)
-throw"No active process!";if(!this._bufferStack.length)
-throw"Buffer stack is empty!";let ar=new Uint8Array(process.instance.exports.memory.buffer);ar.set(new Uint8Array(this._bufferStack.pop()),offset);}
+throw"No active process!";if(!this._bufferStackLengths.length)
+throw"Buffer stack is empty!";let ar=new Uint8Array(process.instance.exports.memory.buffer);ar.set(new Uint8Array(this._popArrayBuffer()),offset);}
 connectTo(){let url=(new URL(this._popString(),this._baseUrl)).toString();this._sysCall("connectTo",url);this._active=false;}
 shutdown(){this._sysCall("removeMachine");this._active=false;}
 getBaseUrl(){return this._pushString(this._baseUrl);}
@@ -87,6 +87,8 @@ write(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;l
 throw"cross origin not allowed!";this._sysRequest("write",filename,data).then((success)=>{callback(success,id);}).catch((err)=>{console.error(err);callback(false,id);});return id;}
 delete(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("delete",filename).then((success)=>{callback(success,id);}).catch((err)=>{console.error(err);callback(false,id);});return id;}
+list(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+throw"cross origin not allowed!";this._sysRequest("list",filename).then((list)=>{callback(true,this._pushString(list),id);}).catch((err)=>{console.error(err);callback(false,0,id);});return id;}
 setStepInterval(milliseconds){this._stepInterval=milliseconds;}
 loadProcess(){let wasm=this._popArrayBuffer();let env=this._processes.length?this._generateProcessApi():this._generateRomApi();let pid=this._processes.length;this._processes.push(null);WebAssembly.instantiate(wasm,{env,Math}).then((process)=>{this._activePID=pid;this._processes[pid]=process;if(process.instance.exports.init){try{process.instance.exports.init();}
 catch(error){this._die(error);}}
@@ -98,12 +100,13 @@ callbackProcess(pid,tableIndex,...a){let oldpid=this._activePID;this._activePID=
 process.instance.export.table.get(tableIndex)(...a);this._activePID=oldpid;}
 killProcess(pid){this._processes[pid]=false;this._activePID=0;}
 transferMemory(srcPid,srcOffset,length,destPid,destOffset){let srcProcess=this._processes[srcPid];let destProcess=this._processes[destPid];if(!srcProcess)
-throw"No active process!";let ar=new Uint8Array(destProcess.instance.exports.memory.buffer);ar.set(new Uint8Array(srcProcess.instance.exports.memory.buffer.slice(srcOffset,srcOffset+length)),destOffset);this._bufferStack.push(ar.buffer);}
+throw"No active process!";let ar=new Uint8Array(destProcess.instance.exports.memory.buffer);ar.set(new Uint8Array(srcProcess.instance.exports.memory.buffer.slice(srcOffset,srcOffset+length)),destOffset);}
 focusInput(input){this._inputFocus=input;switch(input){case 1:this._sysCall("focusInput","text");break;case 2:this._sysCall("focusInput","mouse");break;case 3:this._sysCall("focusInput","game");break;}}
 getInputText(){return this._pushString(this._textInputState.text);}
 getInputPosition(){return this._textInputState.pos;}
 getInputSelected(){return this._textInputState.len;}
 getInputKey(){return this._textInputState.key;}
+setInputType(type){this._textInputState.type=type;this._textInputState.text="";this._textInputState.pos=0;this._textInputState.len=0;this._sysCall("setTextInput",this._textInputState.text,this._textInputState.pos||0,this._textInputState.len||0,this._inputTypes[this._textInputState.type]);}
 setInputText(){this._textInputState.text=this._popString();this._textInputState.pos=Math.min(this._textInputState.text.length,this._textInputState.pos);this._textInputState.len=Math.min(this._textInputState.text.length-this._textInputState.pos,this._textInputState.len);this._sysCall("setTextInput",this._textInputState.text,this._textInputState.pos||0,this._textInputState.len||0);}
 setInputPosition(position=0,selection=0){this._textInputState.pos=position||0;this._textInputState.len=selection||0;this._textInputState.pos=Math.min(this._textInputState.text.length,this._textInputState.pos);this._textInputState.len=Math.min(this._textInputState.text.length-this._textInputState.pos,this._textInputState.len);this._sysCall("setTextInput",this._textInputState.text,this._textInputState.pos||0,this._textInputState.len||0);}
 replaceInputText(fromIndex=0){let replace=this._popString();let search=this._popString();this._sysCall("replaceTextInput",search,replace,fromIndex);let text=this._textInputState.text;let i=text.indexOf(search,fromIndex);if(i>=0){text=text.substr(0,i)+replace+text.substr(i+search.length);this._textInputState.text=text;if(this._textInputState.pos>i){this._textInputState.pos+=replace.length-search.length;}}}
@@ -121,16 +124,16 @@ stopTone(channel){this._sysCall("stopTone",channel);}
 wabt(){let wast=this._popString();let module=wabt.parseWat("idunno.wast",wast);return this._pushArrayBuffer(module.toBinary({}).buffer);}
 _tick(){if(!this._active)
 return;let t=performance.now();let process=this._processes[0];if(!process)
-return this._active=false;setTimeout(this._tick.bind(this),this._nextStep+this._stepInterval-t);try{let stepped=!(process.instance.exports.step);if(process.instance.exports.step){if(this._stepInterval<=0)
-this._stepInterval=1;while(t>=this._nextStep){if(this._keyBuffer.length)
-this._textInputState.key=this._keyBuffer.shift();process.instance.exports.step(this._nextStep);stepped=true;this._nextStep+=this._stepInterval;}}
-else{if(this._keyBuffer.length)
-this._textInputState.key=this._keyBuffer.shift();}
+return this._active=false;if(t>this._nextStep){setTimeout(this._tick.bind(this),this._nextStep+this._stepInterval-t);}
+else{setTimeout(this._tick.bind(this),this._nextStep-t);}
+try{let stepped=!(process.instance.exports.step);if(process.instance.exports.step){if(this._stepInterval<=0)
+this._stepInterval=1;while(t>=this._nextStep){this._textInputState.key=this._keyBuffer.shift()||0;process.instance.exports.step(this._nextStep);stepped=true;this._nextStep+=this._stepInterval;}}
+else{this._textInputState.key=this._keyBuffer.shift()||0;}
 if(this._transferBuffer&&stepped&&process.instance.exports.display){process.instance.exports.display(t);}
 this._nextFrame+=this._frameInterval;}
 catch(error){this._die(error);}}
 _initCom(){self.addEventListener("message",this._onMessage.bind(this));}
-_onMessage(e){switch(e.data.cmd){case"boot":this._active=true;this._pushString(e.data.url);this.setBaseUrl();this._originUrl=e.data.origin;this._pushArrayBuffer(e.data.wasm);this.loadProcess();break;case"suspend":this._active=false;this._mouseInputState.pressed=false;this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};break;case"resume":if(this._displayMode>=0){this.setDisplayMode(this._displayMode,this._displayWidth,this._displayHeight,this._visibleWidth,this._visibleHeight);this._pushString(this._textInputState.text);this.setInputText();this.focusInput(this._inputFocus);}
+_onMessage(e){switch(e.data.cmd){case"boot":this._active=true;this._pushString(e.data.url);this.setBaseUrl();this._originUrl=e.data.origin;this._pushArrayBuffer(e.data.wasm);this.loadProcess();break;case"suspend":this._active=false;this._mouseInputState.pressed=false;this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};break;case"resume":if(this._displayMode>=0){this.setDisplayMode(this._displayMode,this._displayWidth,this._displayHeight,this._visibleWidth,this._visibleHeight);this.setInputType(this._textInputState.type);this._pushString(this._textInputState.text);this.setInputText();this.focusInput(this._inputFocus);}
 this._nextFrame=this._nextStep=performance.now();this._active=true;this._tick();break;case"break":if(this._processes[0]&&this._processes[0].instance.exports.break){this._processes[0].instance.exports.break();}
 else{this.shutdown();}
 break;case"imagedata":this._transferBuffer=e.data.buffer;let cb;while(cb=this._pendingCommits.pop())
@@ -150,10 +153,12 @@ _copyClass(_class){return class{constructor(...a){return new _class(...a);}};}
 _copyObject(_obj){let obj={};for(let name of Object.getOwnPropertyNames(_obj)){obj[name]=_obj[name];}
 return obj;}
 _copyFunction(_fn){return(...a)=>_fn(...a);}
-_pushArrayBuffer(arbuf){this._bufferStack.push(arbuf);return arbuf.byteLength;}
-_popArrayBuffer(){return this._bufferStack.pop();}
-_pushString(str){let enc=new TextEncoder();let buf=enc.encode(str).buffer;this._bufferStack.push(buf);return buf.byteLength;}
-_popString(){let dec=new TextDecoder("utf-8");return dec.decode(this._bufferStack.pop());}
+_growBufferStack(addition){let old=this._bufferStack;this._bufferStack=new Uint8Array(this._bufferStack.byteLength+addition);this._bufferStack.set(old);}
+_pushArrayBuffer(arbuf){let offset=this._bufferStackLengths.reduce((a=0,b=0)=>a+b,0);if(this._bufferStack.byteLength-offset<arbuf.byteLength){this._growBufferStack(arbuf.byteLength);}
+this._bufferStack.set(new Uint8Array(arbuf),offset);this._bufferStackLengths.push(arbuf.byteLength);return arbuf.byteLength;}
+_popArrayBuffer(){let len=this._bufferStackLengths.pop()||0;let offset=this._bufferStackLengths.reduce((a=0,b=0)=>a+b,0);return this._bufferStack.slice(offset,offset+len);}
+_pushString(str){let enc=new TextEncoder();let buf=enc.encode(str).buffer;return this._pushArrayBuffer(buf);}
+_popString(){let dec=new TextDecoder("utf-8");return dec.decode(this._popArrayBuffer());}
 _die(err){this._processes[0]=false;this.setDisplayMode(0,80,20);this._pushString("\n\nError!\n"+err);this.print();}
 _getCallback(callback){if(typeof callback==="number"){let process=this._processes[this._activePID];if(!process)
 throw"No active process!";callback=process.instance.exports.table.get(callback);}
@@ -168,21 +173,23 @@ _sendState(){let newState=JSON.stringify(this.state);if(this._lastState!==newSta
 _mouseMove(e){this.state.x=e.offsetX/this.scale*devicePixelRatio;this.state.y=e.offsetY/this.scale*devicePixelRatio;this._sendState();}
 _mouseDown(e){this.sys.focusInput("mouse");this.state.x=e.offsetX/this.scale*devicePixelRatio;this.state.y=e.offsetY/this.scale*devicePixelRatio;this.state.pressed=true;this._sendState();}
 _mouseUp(e){this.state.pressed=false;this._sendState();}}
-exports.default=MouseInput;},{}],8:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class TextInput{constructor(sys,_element){this.sys=sys;this._element=_element;this.state={text:"",pos:0,len:0,key:0};this._listeners=[];_element.innerHTML='<textarea cols="80"></textarea>';this._multiline=_element.querySelector("textarea");this._multiline.addEventListener("keydown",this._keyDown.bind(this));this._multiline.addEventListener("keyup",this._keyDown.bind(this));this._multiline.addEventListener("keydown",function(e){if(e.code==="Tab"){let start=this.selectionStart,end=this.selectionEnd,value=this.value;this.value=value.substr(0,start)+"\t"+value.substr(end);this.selectionStart=this.selectionEnd=start+1;e.preventDefault();}});this._input=this._multiline;}
+exports.default=MouseInput;},{}],8:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class TextInput{constructor(sys,_element){this.sys=sys;this._element=_element;this.state={type:"multiline",text:"",pos:0,len:0,key:0};this._listeners=[];_element.innerHTML='<textarea cols="80"></textarea><input/>';this._multiline=_element.querySelector("textarea");this._multiline.addEventListener("keydown",this._keyDown.bind(this));this._multiline.addEventListener("keyup",this._keyDown.bind(this));this._multiline.addEventListener("keydown",function(e){if(e.code==="Tab"){let start=this.selectionStart,end=this.selectionEnd,value=this.value;this.value=value.substr(0,start)+"\t"+value.substr(end);this.selectionStart=this.selectionEnd=start+1;e.preventDefault();}});this._singleline=_element.querySelector("input");this._singleline.addEventListener("keydown",this._keyDown.bind(this));this._singleline.addEventListener("keyup",this._keyDown.bind(this));this._singleline.addEventListener("keydown",function(e){if(e.code==="Tab"){e.preventDefault();}});this._input=this._multiline;}
 focus(){this._input.focus();}
 blur(){this._input.blur();}
-setState(state){;this._input.value=state.text;this._input.selectionStart=state.pos;this._input.selectionEnd=state.pos+state.len;}
+setState(state){if(state.type){if(state.type==="multiline"){this._input=this._multiline;}
+else{this._input=this._singleline;this._input.setAttribute("type",state.type);}
+this.state.type=state.type;};this._input.value=state.text;this._input.selectionStart=state.pos;this._input.selectionEnd=state.pos+state.len;}
 addEventListener(fn){let i=this._listeners.indexOf(fn);if(i<0){this._listeners.push(fn);}}
 removeEventListener(fn){let i=this._listeners.indexOf(fn);if(i>=0){this._listeners.splice(i,1);}}
 _sendState(){let newState=JSON.stringify(this.state);if(this._lastState!==newState){this._lastState=newState;this._listeners.forEach((fn)=>{fn(this.state);});}}
 _keyDown(e){if(e&&e.altKey&&e.code==="KeyG")
-this.sys.focusInput("game");requestAnimationFrame(()=>{this.state.text=this._input.value;this.state.pos=this._input.selectionStart||0;this.state.len=(this._input.selectionEnd||0)-this.state.pos;this.state.key=0;if(e&&e.type==="keydown")
+this.sys.focusInput("game");requestAnimationFrame(()=>{let input=this._input;this.state.text=input.value;this.state.pos=input.selectionStart==null?input.value.length:input.selectionStart;this.state.len=(input.selectionEnd||this.state.pos)-this.state.pos;this.state.key=0;if(e&&e.type==="keydown")
 this.state.key=e.keyCode;if(!this.state.text&&e&&e.type==="keydown"){switch(e.code){case"Backspace":this.state.text="\b \b";break;case"ArrowUp":this.state.text="\x1b[A";break;case"ArrowDown":this.state.text="\x1b[B";break;case"ArrowRight":this.state.text="\x1b[C";break;case"ArrowLeft":this.state.text="\x1b[D";break;}}
 this._sendState();});}}
 exports.default=TextInput;},{}],9:[function(require,module,exports){"use strict";var __awaiter=(this&&this.__awaiter)||function(thisArg,_arguments,P,generator){return new(P||(P=Promise))(function(resolve,reject){function fulfilled(value){try{step(generator.next(value));}catch(e){reject(e);}}
 function rejected(value){try{step(generator["throw"](value));}catch(e){reject(e);}}
 function step(result){result.done?resolve(result.value):new P(function(resolve){resolve(result.value);}).then(fulfilled,rejected);}
-step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});const css_1=require("./css");const GameInput_1=require("./GameInput");const ChipSound_1=require("./ChipSound");const MouseInput_1=require("./MouseInput");const TextInput_1=require("./TextInput");const Breaker_1=require("./Breaker");let scriptSrc;class WebSys{constructor(){this.inputPriority=["text","mouse","game"];this._container=document.querySelector("fantasy-terminal");this._displayMode="";this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._displayCursorCol=-1;this._displayCursorRow=-1;this._displayTextSize=10;this._displayTextSizeDelta=0;this._displayTextEscape="";this._displayScale=8;let scripts=document.querySelectorAll("script");scriptSrc=scripts[scripts.length-1].src;this._initContainer();this.chipSound=new ChipSound_1.default();this.textInput=new TextInput_1.default(this,this._container.querySelector(".input .text"));this.mouseInput=new MouseInput_1.default(this);this.gameInput=new GameInput_1.default(this);this.breaker=new Breaker_1.default(this);}
+step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});const css_1=require("./css");const GameInput_1=require("./GameInput");const ChipSound_1=require("./ChipSound");const MouseInput_1=require("./MouseInput");const TextInput_1=require("./TextInput");const Breaker_1=require("./Breaker");let scriptSrc;let dirCache={};class WebSys{constructor(){this.inputPriority=["text","mouse","game"];this._container=document.querySelector("fantasy-terminal");this._displayMode="";this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._displayCursorCol=-1;this._displayCursorRow=-1;this._displayTextSize=10;this._displayTextSizeDelta=0;this._displayTextEscape="";this._displayScale=8;let scripts=document.querySelectorAll("script");scriptSrc=scripts[scripts.length-1].src;this._initContainer();this.chipSound=new ChipSound_1.default();this.textInput=new TextInput_1.default(this,this._container.querySelector(".input .text"));this.mouseInput=new MouseInput_1.default(this);this.gameInput=new GameInput_1.default(this);this.breaker=new Breaker_1.default(this);}
 setTitle(title){}
 setDisplayMode(mode,width,height,visibleWidth=width,visibleHeight=height){if(this._displayMode===mode&&this._displayWidth===width&&this._displayHeight===height&&this._visibleWidth===visibleWidth&&this._visibleHeight===visibleHeight)
 return;this._displayMode=mode;this._displayWidth=width;this._displayHeight=height;this._visibleWidth=visibleWidth;this._visibleHeight=visibleHeight;delete this._displayTextGrid;delete this._displayBitmap;delete this._displayCanvas;delete this._displayContext;switch(this._displayMode){case"none":break;case"text":this._initTextGrid(width,height);break;case"pixel":this._displayBitmap=new ImageData(width,height);this._initCanvas();break;default:this._displayMode="";this._visibleWidth=-1;this._visibleHeight=-1;throw`DisplayMode ${mode}not supported!`;}
@@ -212,19 +219,27 @@ while(this._displayCursorRow>=this._displayHeight){this._scrollText();}}
 let selector=`div:nth-child(${this._displayCursorRow+1})\nspan:nth-child(${this._displayCursorCol+1})`;let cell=this._displayTextGrid.querySelector(selector);cell.classList.add("current");}
 waitForVsync(){return __awaiter(this,void 0,void 0,function*(){return new Promise((resolve,reject)=>{requestAnimationFrame(resolve);});});}
 createMachine(){return new WebMachineWorker();}
-read(filename,options={}){return __awaiter(this,void 0,void 0,function*(){let res=yield fetch(filename);if(!res.ok)
-throw"read error!";switch(options.type){case"binary":return res.arrayBuffer();case"text":return res.text();case"image":return new Promise((resolve)=>{let blob=res.blob().then((blob)=>{let img=new Image();img.src=URL.createObjectURL(blob);img.addEventListener("load",()=>{let canvas=document.createElement("canvas");let g=canvas.getContext("2d");canvas.width=img.width;canvas.height=img.height;g.drawImage(img,0,0);resolve(g.getImageData(0,0,img.width,img.height));});});});default:throw"Unknown type!";}});}
+read(filename,options={}){return __awaiter(this,void 0,void 0,function*(){let res=yield fetch(filename);if(res.ok){this._dirCache(filename,true);}
+else{this._dirCache(filename,false);throw"read error!";}
+let buf=yield res.arrayBuffer();let dec=new TextDecoder("utf-8");let txt=dec.decode(buf);try{let parser=new DOMParser();let url=new URL(filename);let doc=parser.parseFromString(txt,"text/html");let links=doc.querySelectorAll("[href],[src]");for(let link of links){this._dirCache(""+new URL(link.getAttribute("href")||link.getAttribute("src")||".",url));}}
+catch(error){}
+switch(options.type){case"binary":return buf;case"text":return txt;case"image":return new Promise((resolve)=>{let blob=new Blob([buf]);let img=new Image();img.src=URL.createObjectURL(blob);img.addEventListener("load",()=>{let canvas=document.createElement("canvas");let g=canvas.getContext("2d");canvas.width=img.width;canvas.height=img.height;g.drawImage(img,0,0);resolve(g.getImageData(0,0,img.width,img.height));URL.revokeObjectURL(img.src);});});default:throw"Unknown type!";}});}
 write(filename,data){return __awaiter(this,void 0,void 0,function*(){let res=yield fetch(filename,{method:"PUT",body:new Blob([data])});if(!res.ok)
-throw"write error!";return res.ok;});}
+throw"write error!";this._dirCache(filename,true);return res.ok;});}
 delete(filename){return __awaiter(this,void 0,void 0,function*(){let res=yield fetch(filename,{method:"DELETE"});if(!res.ok)
-throw"delete error!";return res.ok;});}
+throw"delete error!";this._dirCache(filename,false);return res.ok;});}
+list(path){return __awaiter(this,void 0,void 0,function*(){if(path.substr(-1)==="/")
+path=path.substr(0,path.length-1);yield this.read(path+"/",{type:"text"});let dir=this._dirCache(path);let list="";for(let name in dir){if(name&&name!=="."&&name!==".."){if(dir[name]){if(typeof dir[name]==="object"){list+=name+"/\n";}
+else{list+=name+"\n";}}
+else if(dir[name]==null){list+=name+"\n";}}}
+return list;});}
 startTone(){this.chipSound.startTone.apply(this.chipSound,arguments);}
 stopTone(){this.chipSound.stopTone.apply(this.chipSound,arguments);}
 focusInput(input){let i=this.inputPriority.indexOf(input);if(i>=0){this.inputPriority.splice(i,1);this.inputPriority.unshift(input);}
 for(let i=0;i<this.inputPriority.length;i++){if(i){this[this.inputPriority[i]+"Input"].blur();}
 else{this[this.inputPriority[i]+"Input"].focus();}}
 return this.inputPriority;}
-setTextInput(text,pos,len){this.textInput.setState({text:text,pos:pos,len:len});}
+setTextInput(text,pos,len,type){this.textInput.setState({type:type,text:text,pos:pos,len:len});}
 replaceTextInput(search,replace="",fromIndex=0){let text=this.textInput.state.text;let pos=this.textInput.state.pos;let len=this.textInput.state.len;let i=text.indexOf(search,fromIndex);if(i>=0){text=text.substr(0,i)+replace+text.substr(i+search.length);if(pos>i){pos+=replace.length-search.length;}
 this.textInput.setState({text:text,pos:pos,len:len});}}
 openWeb(url){location.assign(url);}
@@ -259,7 +274,14 @@ while(this._visibleHeight*this._displayScale>terminalHeight)
 this._displayScale=(1/++divide);}
 this._displayCanvas.style.width=(this._displayCanvas.width*this._displayScale)/devicePixelRatio+"px";this._displayCanvas.style.height=(this._displayCanvas.height*this._displayScale)/devicePixelRatio+"px";this._displayCanvas.style.marginLeft=this._displayCanvas.style.marginRight=(this._visibleWidth-this._displayCanvas.width)/2*this._displayScale/devicePixelRatio+"px";this._displayCanvas.style.marginTop=this._displayCanvas.style.marginBottom=(this._visibleHeight-this._displayCanvas.height)/2*this._displayScale/devicePixelRatio+"px";this._displayCanvas.style.display="inline-block";if(!checkHeight)
 requestAnimationFrame(this._resizeCanvas.bind(this));else
-this.mouseInput.scale=this._displayScale;}}
+this.mouseInput.scale=this._displayScale;}
+_dirCache(path,exists,cache=dirCache){while(path.substr(0,1)==="/")
+path=path.substr(1);let parts=path.split("/");let name=parts.shift()||".";if(parts.length){if(typeof cache!=="object")
+cache={};if(typeof cache[name]!=="object")
+cache[name]={};return this._dirCache(parts.join("/"),exists,cache[name]);}
+else{if(cache[name]==null)
+cache[name]=null;if(typeof exists==="boolean")
+cache[name]=exists;return cache[name];}}}
 exports.default=WebSys;class WebMachineWorker{constructor(){this.worker=new Worker(scriptSrc);}
 send(msg,transferables){this.worker.postMessage(msg,transferables);}
 onMessage(listener){this.worker.addEventListener("message",(e)=>{return listener(e.data,this);});}
