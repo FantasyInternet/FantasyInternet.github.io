@@ -35,6 +35,9 @@
   ;; Pop path from buffer stack and delete the file. Returns a request ID.
   ;; Callback can expect success boolean and same request ID as parameters.
   (import "env" "delete" (func $delete (param $tableIndex i32) (result i32)))
+  ;; Pop path from buffer stack and retrieve directory contents. Returns a request ID.
+  ;; Callback can expect success boolean, length in bytes and same request ID as parameters.
+  (import "env" "list" (func $list (param $tableIndex i32) (result i32)))
 
   ;; Prioritize  given type of input. 1=text, 2=mouse, 3=game.
   (import "env" "focusInput" (func $focusInput (param $input i32)))
@@ -45,6 +48,10 @@
   (import "env" "getInputPosition" (func $getInputPosition (result i32)))
   ;; Get number of characters selected in text input.
   (import "env" "getInputSelected" (func $getInputSelected (result i32)))
+  ;; Get key code of key that was just pressed this step.
+  (import "env" "getInputKey" (func $getInputKey (result i32)))
+  ;; Set the type of text input. 0=multiline, 1=singleline, 2=password, 3=number, 4=url, 5=email, 6=phone
+  (import "env" "setInputType" (func $setInputType (param i32)))
   ;; Pop text from buffer stack and set text of text input.
   (import "env" "setInputText" (func $setInputText))
   ;; Set position and (optionally) selection of text input.
@@ -74,12 +81,12 @@
   (import "env" "getGameButtonY" (func $getGameButtonY (result i32)))
 
   ;; Start generating a tone.
-  (import "env" "startTone" (func $startTone (param $channel i32) (param $frequency i32) (param $volume f32)))
+  (import "env" "startTone" (func $startTone (param $channel i32) (param $frequency i32) (param $volume f32) (param $type i32)))
   ;; Stop generating a tone.
   (import "env" "stopTone" (func $stopTone (param $channel i32)))
 
-  ;; Set step interval.
-  (import "env" "setStepInterval" (func $setStepInterval (param $milliseconds i32)))
+  ;; Set step interval. Set to -1 to only step on input.
+  (import "env" "setStepInterval" (func $setStepInterval (param $milliseconds f64)))
   ;; Pop wasm binary code from buffer stack and load it. Returns new process ID.
   ;; All exports from boot.wasm starting with "api." are forwarded to the process.
   (import "env" "loadProcess" (func $loadProcess (result i32)))
@@ -97,6 +104,16 @@
 
   ;; All JavaScript Math functions are available.
   (import "Math" "random" (func $random (result f32)))
+
+
+
+
+
+;;--------;;--------;;--------;;--------;;--------;;--------;;--------;;
+
+
+
+
 
 
   ;; Table for callback functions.
@@ -157,9 +174,266 @@
   )
   (export "break" (func $break))
 
+
+
+
+
+;;--------;;--------;;--------;;--------;;--------;;--------;;--------;;
+
+
+
+
+
+  ;; String manipulation
+  
+  (func $printStr (param $str i32)
+    (call $print (call $pushFromMemory (call $getPartOffset (get_local $str)) (call $getPartLength (get_local $str))))
+  )
+  
+  (func $createString (param $srcOffset i32) (result i32)
+    (local $str i32)
+    (local $len i32)
+    (set_local $len (i32.const 0))
+    (block(loop
+      (br_if 1 (i32.eq (i32.load8_u (i32.add (get_local $srcOffset) (get_local $len))) (i32.const 0)))
+      (set_local $len (i32.add (get_local $len) (i32.const 1)))
+      (br 0)
+    ))
+    (set_local $str (call $createPart (get_local $len)))
+    (call $copyMem (get_local $srcOffset) (call $getPartOffset (get_local $str)) (get_local $len))
+    (get_local $str)
+  )
+
+  (func $byteAt (param $str i32) (param $pos i32) (result i32)
+    (i32.load8_u (i32.add (call $getPartOffset (get_local $str)) (get_local $pos)))
+  )
+  
+  (func $substr (param $str i32) (param $pos i32) (param $len i32) (result i32)
+    (local $strc i32)
+    (if (i32.gt_u (get_local $pos) (call $getPartLength (get_local $str))) (then
+      (set_local $pos (call $getPartLength (get_local $str)))
+    ))
+    (if (i32.gt_u (get_local $len) (i32.sub (call $getPartLength (get_local $str)) (get_local $pos))) (then
+      (set_local $len (i32.sub (call $getPartLength (get_local $str)) (get_local $pos)) )
+    ))
+    (set_local $strc (call $createPart (get_local $len)))
+    (call $copyMem (i32.add (call $getPartOffset (get_local $str)) (get_local $pos)) (call $getPartOffset (get_local $strc)) (get_local $len))
+    (get_local $strc)
+  )
+  
+  (func $concat (param $stra i32) (param $strb i32) (result i32)
+    (local $strc i32)
+    (set_local $strc (call $createPart (i32.add (call $getPartLength (get_local $stra)) (call $getPartLength (get_local $strb)))))
+    (call $copyMem (call $getPartOffset (get_local $stra)) (call $getPartOffset (get_local $strc)) (call $getPartLength (get_local $stra)))
+    (call $copyMem (call $getPartOffset (get_local $strb)) (i32.add (call $getPartOffset (get_local $strc)) (call $getPartLength (get_local $stra))) (call $getPartLength (get_local $strb)))
+    (get_local $strc)
+  )
+  
+  (func $appendBytes (param $str i32) (param $bytes i64)
+    (local $l i32)
+    (set_local $l (call $getPartLength (get_local $str)))
+    (call $resizePart (get_local $str) (i32.add (get_local $l) (i32.const 9)))
+    (set_local $l (i32.add (get_local $l) (i32.const 1)))
+    (i64.store (i32.add (call $getPartOffset (get_local $str)) (get_local $l)) (i64.const 0))
+    (set_local $l (i32.sub (get_local $l) (i32.const 1)))
+    (i64.store (i32.add (call $getPartOffset (get_local $str)) (get_local $l)) (get_local $bytes))
+    (set_local $l (i32.add (get_local $l) (i32.const 1)))
+    (block(loop
+      (br_if 1 (i32.eq (call $byteAt (get_local $str) (get_local $l)) (i32.const 0)))
+      (set_local $l (i32.add (get_local $l) (i32.const 1)))
+      (br 0)
+    ))
+    (call $resizePart (get_local $str) (get_local $l))
+  )
+  
+  (func $usascii (param $str i32)
+    (local $i i32)
+    (local $l i32)
+    (set_local $i (call $getPartOffset (get_local $str)))
+    (set_local $l (call $getPartLength (get_local $str)))
+    (block (loop
+      (br_if 1 (i32.eq (get_local $l) (i32.const 0)))
+      (if (i32.gt_u (i32.load8_u (get_local $i)) (i32.const 127)) (then
+        (i32.store8 (get_local $i) (i32.const 63))
+      ))
+      (set_local $i (i32.add (get_local $i) (i32.const 1)))
+      (set_local $l (i32.sub (get_local $l) (i32.const 1)))
+      (br 0)
+    ))
+  )
+  
+  (func $getLine (param $str i32) (param $linenum i32) (result i32)
+    (local $line i32)
+    (local $col i32)
+    (local $p i32)
+    (local $strc i32)
+    (block(loop
+      (br_if 1 (get_local $strc))
+      (set_local $col (i32.add (get_local $col) (i32.const 1)))
+      (if (i32.eq (call $byteAt (get_local $str) (get_local $p)) (i32.const 10)) (then
+        (if (i32.eq (get_local $line) (get_local $linenum)) (then
+          (set_local $p (i32.sub (get_local $p) (get_local $col)))
+          (set_local $strc (call $substr (get_local $str) (get_local $p) (get_local $col)))
+          (set_local $p (i32.add (get_local $p) (get_local $col)))
+        ))
+        (set_local $line (i32.add (get_local $line) (i32.const 1)))
+        (set_local $col (i32.const 0))
+      ))
+      (set_local $p (i32.add (get_local $p) (i32.const 1)))
+      (br 0)
+    ))
+    (get_local $strc)
+  )
+
+  (func $countLines (param $str i32) (result i32)
+    (local $line i32)
+    (local $p i32)
+    (local $l i32)
+    (set_local $line (i32.const 1))
+    (set_local $l (call $getPartLength (get_local $str)))
+    (block(loop
+      (br_if 1 (i32.ge_u (get_local $p) (get_local $l)))
+      (if (i32.eq (call $byteAt (get_local $str) (get_local $p)) (i32.const 10)) (then
+        (set_local $line (i32.add (get_local $line) (i32.const 1)))
+      ))
+      (set_local $p (i32.add (get_local $p) (i32.const 1)))
+      (br 0)
+    ))
+    (get_local $line)
+  )
+
+  (func $lineAt (param $str i32) (param $pos i32) (result i32)
+    (local $line i32)
+    (local $p i32)
+    (block(loop
+      (br_if 1 (i32.eq (get_local $p) (get_local $pos)))
+      (if (i32.eq (call $byteAt (get_local $str) (get_local $p)) (i32.const 10)) (then
+        (set_local $line (i32.add (get_local $line) (i32.const 1)))
+      ))
+      (set_local $p (i32.add (get_local $p) (i32.const 1)))
+      (br 0)
+    ))
+    (get_local $line)
+  )
+
+  (func $columnAt (param $str i32) (param $pos i32) (result i32)
+    (local $col i32)
+    (local $p i32)
+    (block(loop
+      (br_if 1 (i32.eq (get_local $p) (get_local $pos)))
+      (set_local $col (i32.add (get_local $col) (i32.const 1)))
+      (if (i32.eq (call $byteAt (get_local $str) (get_local $p)) (i32.const 10)) (then
+        (set_local $col (i32.const 0))
+      ))
+      (set_local $p   (i32.add (get_local $p)   (i32.const 1)))
+      (br 0)
+    ))
+    (get_local $col)
+  )
+  
+  (func $uintToStr (param $int i32) (result i32)
+    (local $order i32)
+    (local $digit i32)
+    (local $str i32)
+    (set_local $order (i32.const 1000000000))
+    (set_local $str (call $createPart (i32.const 0)))
+    (block(loop
+      (br_if 1 (i32.eq (get_local $order) (i32.const 0)))
+      (set_local $digit (i32.div_u (get_local $int) (get_local $order)))
+      (if (i32.or (get_local $digit) (call $getPartLength (get_local $str))) (then
+        (call $appendBytes (get_local $str) (i64.extend_u/i32 (i32.add (i32.const 0x30) (get_local $digit))))
+      ))
+      (set_local $int (i32.rem_u (get_local $int) (get_local $order)))
+      (set_local $order (i32.div_u (get_local $order) (i32.const 10)))
+      (br 0)
+    ))
+    (get_local $str)
+  )
+  
+  (func $compare (param $stra i32) (param $strb i32) (result i32)
+    (local $p i32)
+    (local $l i32)
+    (if (i32.ne (call $getPartLength (get_local $stra)) (call $getPartLength (get_local $strb))) (then
+      (return (i32.const 0))
+    ))
+    (set_local $l (call $getPartLength (get_local $stra)))
+    (block(loop
+      (br_if 1 (i32.eq (get_local $p) (get_local $l)))
+      (if (i32.ne (call $byteAt (get_local $stra) (get_local $p)) (call $byteAt (get_local $strb) (get_local $p))) (then
+        (return (i32.const 0))
+      ))
+      (set_local $p (i32.add (get_local $p) (i32.const 1)))
+      (br 0)
+    ))
+    (i32.const 1)
+  )
+  
+  (func $indexOf (param $haystack i32) (param $needle i32) (param $pos i32) (result i32)
+    (local $sub i32)
+    (if (i32.lt_u (call $getPartLength (get_local $haystack)) (call $getPartLength (get_local $needle))) (then
+      (return (i32.const -1))
+    ))
+    (set_local $sub (call $createPart (call $getPartLength (get_local $needle))))
+    (block(loop
+      (br_if 1 (i32.ge_u (get_local $pos) (i32.sub (call $getPartLength (get_local $haystack)) (call $getPartLength (get_local $needle)))))
+      (call $copyMem (i32.add (call $getPartOffset (get_local $haystack)) (get_local $pos)) (call $getPartOffset (get_local $sub)) (call $getPartLength (get_local $sub)))
+      (if (call $compare (get_local $sub) (get_local $needle)) (then
+        (return (get_local $pos))
+      ))
+      (set_local $pos (i32.add (get_local $pos) (i32.const 1)))
+      (br 0)
+    ))
+    (i32.const -1)
+  )
+
+  (func $lastIndexOf (param $haystack i32) (param $needle i32) (param $pos i32) (result i32)
+    (local $sub i32)
+    (if (i32.lt_u (call $getPartLength (get_local $haystack)) (call $getPartLength (get_local $needle))) (then
+      (return (i32.const -1))
+    ))
+    (set_local $sub (call $createPart (call $getPartLength (get_local $needle))))
+    (block(loop
+      (br_if 1 (i32.eq (get_local $pos) (i32.const 0)))
+      (call $copyMem (i32.add (call $getPartOffset (get_local $haystack)) (get_local $pos)) (call $getPartOffset (get_local $sub)) (call $getPartLength (get_local $sub)))
+      (if (call $compare (get_local $sub) (get_local $needle)) (then
+        (return (get_local $pos))
+      ))
+      (set_local $pos (i32.sub (get_local $pos) (i32.const 1)))
+      (br 0)
+    ))
+    (i32.const -1)
+  )
+  
+  (func $trim (param $str i32)
+    (local $p i32)
+    (local $l i32)
+    (set_local $p (call $getPartOffset (get_local $str)))
+    (set_local $l (call $getPartLength (get_local $str)))
+    (block(loop
+      (br_if 1 (i32.or (i32.eqz (get_local $l)) (i32.gt_u (i32.load8_u (get_local $p)) (i32.const 32))))
+      (set_local $p (i32.add (get_local $p) (i32.const 1)))
+      (set_local $l (i32.sub (get_local $l) (i32.const 1)))
+      (br 0)
+    ))
+    (call $copyMem (get_local $p) (call $getPartOffset (get_local $str)) (get_local $l))
+    (block(loop
+      (br_if 1 (i32.or (i32.eqz (get_local $l)) (i32.gt_u (call $byteAt (get_local $str) (i32.sub (get_local $l) (i32.const 1))) (i32.const 32))))
+      (set_local $l (i32.sub (get_local $l) (i32.const 1)))
+      (br 0)
+    ))
+    (call $resizePart (get_local $str) (get_local $l))
+  )
+
+ 
+
+  
+
+ 
+
   ;; Graphic routines
 
   (global $display (mut i32) (i32.const -1))
+  (global $font    (mut i32) (i32.const -1))
 
   (func $rgb (param $r i32) (param $g i32) (param $b i32) (result i32)
     (local $c i32)
@@ -476,6 +750,7 @@
   )
   (func $copyMem (param $fromOffset i32) (param $toOffset i32) (param $len i32)
     (local $delta i32)
+    (if (i32.eqz (get_local $len)) (return))
     (if (i32.gt_u (get_local $fromOffset) (get_local $toOffset)) (then
       (set_local $delta (i32.const 1))
     )(else

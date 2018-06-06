@@ -35,6 +35,9 @@
   ;; Pop path from buffer stack and delete the file. Returns a request ID.
   ;; Callback can expect success boolean and same request ID as parameters.
   (import "env" "delete" (func $delete (param $tableIndex i32) (result i32)))
+  ;; Pop path from buffer stack and retrieve directory contents. Returns a request ID.
+  ;; Callback can expect success boolean, length in bytes and same request ID as parameters.
+  (import "env" "list" (func $list (param $tableIndex i32) (result i32)))
 
   ;; Prioritize  given type of input. 1=text, 2=mouse, 3=game.
   (import "env" "focusInput" (func $focusInput (param $input i32)))
@@ -47,6 +50,8 @@
   (import "env" "getInputSelected" (func $getInputSelected (result i32)))
   ;; Get key code of key that was just pressed this step.
   (import "env" "getInputKey" (func $getInputKey (result i32)))
+  ;; Set the type of text input. 0=multiline, 1=singleline, 2=password, 3=number, 4=url, 5=email, 6=phone
+  (import "env" "setInputType" (func $setInputType (param i32)))
   ;; Pop text from buffer stack and set text of text input.
   (import "env" "setInputText" (func $setInputText))
   ;; Set position and (optionally) selection of text input.
@@ -80,8 +85,8 @@
   ;; Stop generating a tone.
   (import "env" "stopTone" (func $stopTone (param $channel i32)))
 
-  ;; Set step interval.
-  (import "env" "setStepInterval" (func $setStepInterval (param $milliseconds i32)))
+  ;; Set step interval. Set to -1 to only step on input.
+  (import "env" "setStepInterval" (func $setStepInterval (param $milliseconds f64)))
   ;; Pop wasm binary code from buffer stack and load it. Returns new process ID.
   ;; All exports from boot.wasm starting with "api." are forwarded to the process.
   (import "env" "loadProcess" (func $loadProcess (result i32)))
