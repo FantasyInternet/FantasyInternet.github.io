@@ -145,7 +145,7 @@
 
   ;; Init function is called once on start.
   (func $init
-    (call $setStepInterval (i32.const 64))
+    (call $setStepInterval (f64.div (f64.const 1000) (f64.const 16))) ;; 16 fps
     (call $setDisplayMode (i32.const 0) (i32.const 80) (i32.const 20) (i32.const 80) (i32.const 20))
     (set_global $readmeReq    (call $read (call $pushFromMemory (i32.const 0xf100) (i32.const 11)) (i32.const 1)))
   )
