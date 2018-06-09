@@ -4,6 +4,7 @@
 // @import "{{ site.theme }}";
 @import url('https://fonts.googleapis.com/css?family=Geostar+Fill|Press+Start+2P|VT323|Special+Elite');
 
+// reset
 * {
   color: inherit;
   font-size: inherit;
@@ -11,26 +12,22 @@
   margin: 0;
   padding: 0;
 }
-figcaption,
-figure,
-main {
+figcaption, figure, main {
   display: block;
 }
-ul,
-ol,
-li {
+ul, ol, li {
   list-style: none;
 }
-img,
-canvas {
+img, canvas {
   border: none;
   max-width: 100%;
 }
+
+// basics
 * {
   box-sizing: inherit;
 }
-html,
-.fullscreen {
+html, .fullscreen {
   background-color: #ffe;
   box-sizing: border-box;
   color: #234;
@@ -40,31 +37,14 @@ html,
   line-height: 1.42382813;
 }
 @media screen and (min-width: 96em) {
-  html,
-  .fullscreen {
+  html, .fullscreen {
     font-size: 1.42382813vw;
   }
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-ol,
-ul,
-table,
-form,
-pre {
+h1, h2, h3, h4, h5, h6, p, ol, ul, table, form, pre {
   margin: 0.88888889em 0.79012346rem;
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: "Verdana", sans-serif;
   font-weight: bold;
   margin-bottom: 0;
@@ -99,10 +79,7 @@ h6 {
   text-decoration: underline;
   font-weight: normal;
 }
-ol ol,
-ul ol,
-ol ul,
-ul ul {
+ol ol, ul ol, ol ul, ul ul {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -118,8 +95,7 @@ ul > li {
 a {
   color: #06c;
 }
-th,
-td {
+th, td {
   padding: 0.30794615em 0.55492896em;
 }
 canvas {
@@ -131,6 +107,8 @@ canvas {
   max-width: 48em;
   position: relative;
 }
+
+// style
 html {
   background-color: #123;
   background-image: url("abstract-3293076_1280.jpg");
@@ -175,14 +153,17 @@ header nav ul li a {
   display: block;
   text-decoration: none;
 }
-h1 {
+h1, h2, h3, h4 {
   font-family: "VT323";
-  font-size: 3em;
   font-weight: normal;
   line-height: 1em;
   margin-top: 0;
   text-transform: none;
 }
+h1 { font-size: 3em; }
+h2 { font-size: 2em; }
+h3 { font-size: 1em; }
+h4 { font-size: .5em; }
 article {
   background-color: rgba(0, 0, 0, 0.75);
   border: .01em solid;

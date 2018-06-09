@@ -4,17 +4,22 @@ When connecting to a URL, the terminal will look for a `boot.wasm` file near the
 
 API functions
 -------------
-The following functions can be imported from the `"env"` field. In a `.wast`-file it would look like this:
+The following functions can be imported from the `"env"` field. In a `.wast`-file it would look something like this:
 
-    (import "env" "callApiFunction" (func $callApiFunction (param $index i32) (param $a i32) (result i32)))
+    (import "env" "callApiFunction"
+      (func $callApiFunction
+        (param $index i32)
+        (param $value i32)
+        (result i32)
+      )
+    )
 
 ### pushFromMemory(offset, length)
 Push memory range to buffer stack.
 
+### popToMemory(offset)
+Pop one buffer off the buffer stack and store in memory.
 
-    (import "env" "pushFromMemory" (func $pushFromMemory (param $offset i32) (param $length i32)))
-    ;; Pop one buffer off the buffer stack and store in memory.
-    (import "env" "popToMemory" (func $popToMemory (param $offset i32)))
     ;; Pop API function name off the buffer stack and return index or 0 if not found.
     (import "env" "getApiFunctionIndex" (func $getApiFunctionIndex (result i32)))
     ;; Call API function by index. Use any number of parameters and return values.
