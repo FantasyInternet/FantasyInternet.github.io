@@ -1,8 +1,2 @@
-<style>
-  html {
-    background-color: black;
-    color: white
-  }
-</style>
 <fantasy-terminal></fantasy-terminal>
 <script src="cyberterminal-web.js"></script>
