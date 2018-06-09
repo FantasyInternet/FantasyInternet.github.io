@@ -161,9 +161,9 @@ h1, h2, h3, h4 {
   text-transform: none;
 }
 h1 { font-size: 3em; }
-h2 { font-size: 2em; }
-h3 { font-size: 1em; }
-h4 { font-size: .5em; }
+h2 { font-size: 2em; text-decoration: underline; }
+h3 { font-size: 2em; font-weight: bold; }
+h4 { font-size: 2em; }
 article {
   background-color: rgba(0, 0, 0, 0.75);
   border: .01em solid;

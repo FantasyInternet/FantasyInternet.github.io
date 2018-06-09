@@ -20,8 +20,10 @@ Push memory range to buffer stack.
 ### popToMemory(offset)
 Pop one buffer off the buffer stack and store in memory.
 
-    ;; Pop API function name off the buffer stack and return index or 0 if not found.
-    (import "env" "getApiFunctionIndex" (func $getApiFunctionIndex (result i32)))
+### getApiFunctionIndex(): index
+Pop API function name off the buffer stack and return index or 0 if not found.
+
+
     ;; Call API function by index. Use any number of parameters and return values.
     (import "env" "callApiFunction" (func $callApiFunction (param $index i32) (param $a i32) (result i32)))
     (import "env" "callApiFunction" (func $api_i32i32_i32 (param $index i32) (param $a i32) (param $b i32) (result i32)))
