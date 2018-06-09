@@ -2,43 +2,60 @@
 <html lang="{{ site.lang | default: " en-US " }}">
 
 <head>
-  <meta charset='utf-8'>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" />
+  <meta name="theme-color" content="#222" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@codeartistic" />
+  <meta name="twitter:title" content="The Fantasy Internet" />
+  <meta name="twitter:description" content="Welcome to cyberspace!" />
+  <meta name="twitter:creator" content="@codeartistic" />
+  <meta name="twitter:image" content="https://fantasyinternet.github.io/images/retrowave64.gif" />
+  <meta property="og:url" content="https://fantasyinternet.github.io/" />
+  <meta property="og:title" content="The Fantasy Internet" />
+  <meta property="og:description" content="Welcome to cyberspace!" />
+  <meta property="og:image" content="https://fantasyinternet.github.io/images/retrowave64.gif" />
+  <link rel="icon" type="image/png" href="images/icon.png" />
   <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}"> {% seo %}
 </head>
 
 <body>
-
   <header>
-    <div class="container">
-      <h1>{{ site.title | default: site.github.repository_name }}</h1>
-      <h2>{{ site.description | default: site.github.project_tagline }}</h2>
-
-      <section id="downloads">
-        {% if site.show_downloads %}
-        <a href="{{ site.github.zip_url }}" class="btn">Download as .zip</a>
-        <a href="{{ site.github.tar_url }}" class="btn">Download as .tar.gz</a>
-        {% endif %}
-        <a href="{{ site.github.repository_url }}" class="btn btn-github">
-          <span class="icon"></span>View on GitHub</a>
-      </section>
-    </div>
+    <h1>{{ site.title | default: site.github.repository_name }}</h1>
+    <nav>
+      <ul>
+        <li>
+          <a href="./">Overview</a>
+        </li>
+        <li>
+          <a href="./download">Download</a>
+        </li>
+        <li>
+          <a href="./about">What?</a>
+        </li>
+        <li>
+          <a href="./tech">How?</a>
+        </li>
+      </ul>
+    </nav>
   </header>
 
-  <div class="container">
-    <section id="main_content">
-      {{ content }}
-    </section>
-  </div>
+  <article class="page">
+    {{ content }}
+  </article>
+
+  <footer>
+    <a href="http://codeartistic.ninja">codeartistic.ninja</a>
+  </footer>
 
   {% if site.google_analytics %}
   <script>
     (function (i, s, o, g, r, a, m) {
-    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-      (i[r].q = i[r].q || []).push(arguments)
-    }, i[r].l = 1 * new Date(); a = s.createElement(o),
-      m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
     })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
     ga('create', '{{ site.google_analytics }}', 'auto');
     ga('send', 'pageview');
