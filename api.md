@@ -2,6 +2,8 @@ The Fantasy Internet API standard
 =================================
 When connecting to a URL, the terminal will look for a `boot.wasm` file near the root of the domain. Once found, it will load and instantiate with the following functions available to import and use.
 
+{:toc}
+
 API functions
 -------------
 The following functions can be imported from the `"env"` field. In a `.wa(s)t`-file it would look something like this:
@@ -19,7 +21,7 @@ The following functions can be imported from the `"env"` field. In a `.wa(s)t`-f
 
 WebAssembly (wasm) only supports numerical datatypes as function parameters and return types. To pass strings and binary data back and forth, you can use the buffer stack to copy any length of data in and out of linear memory.
 
-The `offset` and `length` parameters specify, in bytes, where in memory the data should be copied. Make sure to allocate enough memory when popping data to memory. Functions that pushes data to the stack usually tells you how many bytes were just pushed.
+The `offset` and `length` parameters specify, in bytes, where in memory the data should be copied. Make sure to allocate enough memory when popping data to memory. Functions that pushes data to the stack usually tell you how many bytes were just pushed.
 
 Parameters and return values that needs to be passed through the buffer stack (and not as actual parameters) will be suffixed with a `$` in this documentation. Functions that return a buffer actually return its length in bytes instead, so you know how much data you can expect to pop off the stack.
 
