@@ -135,7 +135,7 @@
     (export "memory" (memory $memory))
     (data (i32.const 0xf100) "./README.md");;11
     (data (i32.const 0xf200) "./about.md");;10
-    (data (i32.const 0xf300) "./tech.md");;9
+    (data (i32.const 0xf300) "./api.md");;8
     (data (i32.const 0xf400) "./download.md");;13
     (data (i32.const 0xf500) "./boot.wast");;11
 
@@ -170,7 +170,7 @@
       (if (i32.eq (get_local $req) (get_global $aboutReq)) (then
         (set_global $about (call $createPart (get_local $len)))
         (call $popToMemory (call $getPartOffset (get_global $about)))
-        (set_global $techReq      (call $read (call $pushFromMemory (i32.const 0xf300) (i32.const 9)) (i32.const 1)))
+        (set_global $techReq      (call $read (call $pushFromMemory (i32.const 0xf300) (i32.const 8)) (i32.const 1)))
       ))
       (if (i32.eq (get_local $req) (get_global $techReq)) (then
         (set_global $tech (call $createPart (get_local $len)))
