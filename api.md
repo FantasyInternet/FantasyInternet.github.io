@@ -102,7 +102,9 @@ Input from the user can be prioritized depending on context. This is useful on m
 
 The navigation system is (primarily) stack based. Connecting to a URL suspends the current connection and adds a new one to the navigation stack. Shutdown terminates the current connection (deleting its state and memory), pops it off the stack and returns control to the previous connection.
 
-The URL connected to will be the initial base URL, where any relative URLs are resolved from. Only resources residing in the same folder as `boot.wasm` can be accessed.
+The URL connected to will be the initial base URL, where any relative URLs are resolved from. This is useful for creating permalinks that boots straight into a specific resource. Only resources residing in the same folder as `boot.wasm` (or subfolders) can be accessed.
+
+Currently `http(s):` and `file:` URL schemes are supported.
 
 ### File system
     read(path$, callback(success, length$, requestID) ): requestID
@@ -118,7 +120,7 @@ File access is done through asyncrounous calls like these. The `callback` parame
 
 If the operation fails, `success` will be zero and nothing will be pushed to the buffer stack.
 
-`list()` will return a line seperated list of filenames discovered in the specified folder through webcrawling. This works best if the server generates directory listings.
+`list()` will return a line seperated list of filenames discovered in the specified folder through webcrawling. This works best if the server generates directory listings. If the `file:` scheme is used, it will simply return the directory contents.
 
 ### Process handling
     setStepInterval(milliseconds) // Set to -1 to only step on input.
