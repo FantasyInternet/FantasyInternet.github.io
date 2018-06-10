@@ -62,31 +62,12 @@ Pixel mode relies on part of linear memory to hold a string of RGBA bytes. 4 byt
 
 `visibleWidth` and `visibleHeight` can be used to simulate overscan. This is useful for border graphics that is not part of the main display and therefore may be hidden to make best use of the physical pixels.
 
-### Navigation
-    connectTo(url$)
-    shutdown()
-    getBaseUrl(): url$
-    setBaseUrl(url$)
+### Audio
+    // types: 0=square, 1=sawtooth, 2=triangle, 3=sine
+    startTone(channel, frequency [, volume [, type]])
+    stopTone(channel)
 
-The navigation system is (primarily) stack based. Connecting to a URL suspends the current connection and adds a new one to the navigation stack. Shutdown terminates the current connection (deleting its state and memory), pops it off the stack and returns control to the previous connection.
-
-The URL connected to will be the initial base URL, where any relative URLs are resolved from. Only resources residing in the same folder as `boot.wasm` can be accessed.
-
-### File system
-    read(path$, callback(success, length$, requestID) ): requestID
-    write(path$, data$, callback(success, requestID)): requestID
-    delete(path$, callback(success, requestID)): requestID
-    list(path$, callback(success, length$, requestID)): requestID
-
-    // readImage may be obsoleted in the future.
-    // width$ and height$ refer to the same buffer.
-    readImage(path$, callback(success, width$, height$, requestID)): requestID
-
-File access is done through asyncrounous calls like these. The `callback` parameter is actually an index in the function table. Each of these functions return a `requestID` which is then passed again to the callback function once the operation completes. This makes it useful for the callback function to distinguish between multiple requests as they may not complete in the same order they were issued.
-
-If the operation fails, `success` will be zero and nothing will be pushed to the buffer stack.
-
-`list()` will return a line seperated list of filenames discovered in the specified folder through webcrawling. This works best if the server generates directory listings.
+It is recommended to only use `stopTone()` when done you are done playing audio for a while, as it may cause a slight pop in the speakers.
 
 ### User input
     focusInput(type) // 1=text, 2=mouse, 3=game.
@@ -113,12 +94,31 @@ If the operation fails, `success` will be zero and nothing will be pushed to the
 
 Input from the user can be prioritized depending on context. This is useful on mobile devices with touchscreen as focusing on a specific type of input may produce an onscreen keyboard, touch controls etc..
 
-### Audio
-    // types: 0=square, 1=sawtooth, 2=triangle, 3=sine
-    startTone(channel, frequency [, volume [, type]])
-    stopTone(channel)
+### Navigation
+    connectTo(url$)
+    shutdown()
+    getBaseUrl(): url$
+    setBaseUrl(url$)
 
-It is recommended to only use `stopTone()` when done you are done playing audio for a while, as it may cause a slight pop in the speakers.
+The navigation system is (primarily) stack based. Connecting to a URL suspends the current connection and adds a new one to the navigation stack. Shutdown terminates the current connection (deleting its state and memory), pops it off the stack and returns control to the previous connection.
+
+The URL connected to will be the initial base URL, where any relative URLs are resolved from. Only resources residing in the same folder as `boot.wasm` can be accessed.
+
+### File system
+    read(path$, callback(success, length$, requestID) ): requestID
+    write(path$, data$, callback(success, requestID)): requestID
+    delete(path$, callback(success, requestID)): requestID
+    list(path$, callback(success, length$, requestID)): requestID
+
+    // readImage may be obsoleted in the future.
+    // width$ and height$ refer to the same buffer.
+    readImage(path$, callback(success, width$, height$, requestID)): requestID
+
+File access is done through asyncrounous calls like these. The `callback` parameter is actually an index in the function table. Each of these functions return a `requestID` which is then passed again to the callback function once the operation completes. This makes it useful for the callback function to distinguish between multiple requests as they may not complete in the same order they were issued.
+
+If the operation fails, `success` will be zero and nothing will be pushed to the buffer stack.
+
+`list()` will return a line seperated list of filenames discovered in the specified folder through webcrawling. This works best if the server generates directory listings.
 
 ### Process handling
     setStepInterval(milliseconds) // Set to -1 to only step on input.
