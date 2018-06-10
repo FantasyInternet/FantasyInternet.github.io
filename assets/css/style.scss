@@ -1,10 +1,9 @@
 ---
 ---
 
-// @import "{{ site.theme }}";
 @import url('https://fonts.googleapis.com/css?family=Geostar+Fill|Press+Start+2P|VT323|Special+Elite');
 
-// reset
+ /* reset */
 * {
   color: inherit;
   font-size: inherit;
@@ -23,7 +22,7 @@ img, canvas {
   max-width: 100%;
 }
 
-// basics
+/* // basics */
 * {
   box-sizing: inherit;
 }
@@ -108,7 +107,7 @@ canvas {
   position: relative;
 }
 
-// style
+/* // style */
 html {
   background-color: #123;
   background-image: url("abstract-3293076_1280.jpg");
@@ -154,26 +153,30 @@ header nav ul li a {
   text-decoration: none;
 }
 h1, h2, h3, h4 {
-  font-family: "VT323";
+  font-family: "Press Start 2P";
   font-weight: normal;
   line-height: 1em;
-  margin-top: 0;
+  /* margin-top: 0; */
   text-transform: none;
 }
-h1 { font-size: 3em; }
-h2 { font-size: 2em; text-decoration: underline; }
-h3 { font-size: 2em; font-weight: bold; }
-h4 { font-size: 2em; }
+h1 { font-size: 2em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1em; }
+h4 { font-size: 1em; }
 article {
   background-color: rgba(0, 0, 0, 0.75);
   border: .01em solid;
   box-shadow: 0 0 1em;
-  font-family: "Press Start 2P";
+  font-family: "VT323";
   min-height: calc(100vh - 8.2em);
 }
 pre {
   background-color: rgba(0, 0, 0, 0.75);
-  color: #eff;
+  /* font-size: .8em; */
+}
+code {
+  color: #9cf;
+  font-family: "VT323";
 }
 a {
   color: #eff;

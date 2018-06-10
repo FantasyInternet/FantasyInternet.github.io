@@ -7,11 +7,7 @@ API functions
 The following functions can be imported from the `"env"` field. In a `.wast`-file it would look something like this:
 
     (import "env" "callApiFunction"
-      (func $callApiFunction
-        (param $index i32)
-        (param $value i32)
-        (result i32)
-      )
+      (func $callApiFunction (param $index i32) (param $value i32) (result i32) )
     )
 
 ### pushFromMemory(offset, length)
