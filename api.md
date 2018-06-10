@@ -2,6 +2,7 @@ The Fantasy Internet API standard
 =================================
 When connecting to a URL, the terminal will look for a `boot.wasm` file near the root of the domain. Once found, it will load and instantiate with the following functions available to import and use.
 
+* Table of contents
 {:toc}
 
 API functions
