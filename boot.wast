@@ -82,6 +82,7 @@
 
   ;; Step function is called once every interval.
   (func $step (param $t f64)
+    (call $enterPart (call $createPart (i32.const 1)))
     (if (i32.eq (get_global $mode) (i32.const 0))(then
       (call $printStr (get_global $prompt))
       (call $print (drop (call $getInputText)))
@@ -124,10 +125,12 @@
         ))
       ))
     ))
+    (call $deleteParent)
   )
   (export "step" (func $step))
 
   (func $dump (param $success i32) (param $len i32) (param $req i32)
+    (call $enterPart (call $createPart (i32.const 1)))
     (if (get_local $success) (then
       (call $printStr (call $popString (get_local $len)))
       (call $printStr (get_global $nl))
@@ -136,9 +139,11 @@
       (call $printStr (get_global $err))
     ))
     (set_global $mode (i32.const 0))
+    (call $deleteParent)
   )
 
   (func $loadLess (param $success i32) (param $len i32) (param $req i32)
+    (call $enterPart (call $createPart (i32.const 1)))
     (if (get_local $success) (then
       (call $resizePart (get_global $lessFile) (get_local $len))
       (call $popToMemory (call $getPartOffset (get_global $lessFile)))
@@ -148,6 +153,7 @@
       (call $printStr (get_global $err))
       (set_global $mode (i32.const 0))
     ))
+    (call $deleteParent)
   )
 
 
@@ -266,7 +272,6 @@
       (if (i32.eq (call $byteAt (get_local $str) (get_local $p)) (i32.const 10)) (then
         (if (i32.eq (get_local $line) (get_local $linenum)) (then
           (set_local $p (i32.sub (get_local $p) (i32.sub (get_local $col) (i32.const 1))))
-          (call $log3Numbers (get_local $str) (get_local $p) (get_local $col))
           (set_local $strc (call $substr (get_local $str) (get_local $p) (get_local $col)))
           (set_local $p (i32.add (get_local $p) (i32.sub (get_local $col) (i32.const 1))))
         ))
@@ -276,7 +281,6 @@
       (set_local $p (i32.add (get_local $p) (i32.const 1)))
       (br 0)
     ))
-    ;; (call $log3Numbers (get_local $linenum) (get_local $strc) (call $getPartLength (get_local $strc)))
     (get_local $strc)
   )
 
