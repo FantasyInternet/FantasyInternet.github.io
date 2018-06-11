@@ -15,6 +15,8 @@
   (import "env" "getInputText" (func $getInputText (result i32)))
   (import "env" "setInputText" (func $setInputText ))
   (import "env" "getInputKey" (func $getInputKey (result i32)))
+  (import "env" "getBaseUrl" (func $getBaseUrl (result i32)))
+  (import "env" "setBaseUrl" (func $setBaseUrl ))
 
 
 
@@ -37,7 +39,7 @@
   ;; Linear memory.
   (memory $memory 1)
     (export "memory" (memory $memory))
-    (data (i32.const 0xf100) "\1b[K\n\1b[A$ ")
+    (data (i32.const 0xf100) "\1b[K\n\1b[A")
     (data (i32.const 0xf200) "\n")
     (data (i32.const 0xf300) "The command you entered was: ")
     (data (i32.const 0xf400) "ls")
@@ -45,11 +47,14 @@
     (data (i32.const 0xf600) "\nerr!\n\n")
     (data (i32.const 0xf700) "cat ")
     (data (i32.const 0xf800) "less ")
-    (data (i32.const 0xf900) "Commands available:\n\nls\t\tList directory contents.\ncat <filename>\tPrint file contents.\nless <filename>\tPrint file line by line.\n\n")
+    (data (i32.const 0xf900) "Commands available:\n\ncd <dir>/\tChange directory.\nls\t\tList directory contents.\ncat <filename>\tPrint file contents.\nless <filename>\tPrint file line by line.\n\n")
+    (data (i32.const 0xfa00) "cd ")
+    (data (i32.const 0xfb00) " > ")
 
   ;; Global variables
   (global $mode     (mut i32) (i32.const 0))
   (global $prompt   (mut i32) (i32.const 0))
+  (global $prompt2  (mut i32) (i32.const 0))
   (global $nl       (mut i32) (i32.const 0))
   (global $command  (mut i32) (i32.const 0))
   (global $confirm  (mut i32) (i32.const 0))
@@ -60,6 +65,7 @@
   (global $lessCmd  (mut i32) (i32.const 0))
   (global $lessFile (mut i32) (i32.const 0))
   (global $lessLine (mut i32) (i32.const 0))
+  (global $cdCmd    (mut i32) (i32.const 0))
 
   ;; Init function is called once on start.
   (func $init
@@ -74,6 +80,9 @@
     (set_global $err (call $createString (i32.const 0xf600)))
     (set_global $catCmd (call $createString (i32.const 0xf700)))
     (set_global $lessCmd (call $createString (i32.const 0xf800)))
+    (set_global $cdCmd (call $createString (i32.const 0xfa00)))
+    (set_global $prompt2 (call $createString (i32.const 0xfb00)))
+    
     (set_global $command (call $createPart (i32.const 0)))
     (set_global $lessFile (call $createPart (i32.const 0)))
     (call $printStr (call $createString (i32.const 0xf900)))
@@ -85,6 +94,8 @@
     (call $enterPart (call $createPart (i32.const 1)))
     (if (i32.eq (get_global $mode) (i32.const 0))(then
       (call $printStr (get_global $prompt))
+      (call $print (drop (call $getBaseUrl)))
+      (call $printStr (get_global $prompt2))
       (call $print (drop (call $getInputText)))
       (if (i32.eq (call $getInputKey) (i32.const 13))(then
         (call $printStr (get_global $nl))
@@ -94,6 +105,9 @@
         (call $printStr (get_global $nl))
         (if (call $compare (get_global $command) (get_global $lsCmd))(then
           (set_global $mode (i32.const 1))
+        ))
+        (if (call $compare (call $substr (get_global $command) (i32.const 0) (call $getPartLength (get_global $cdCmd))) (get_global $cdCmd))(then
+          (call $setBaseUrl (call $pushString (call $substr (get_global $command) (i32.const 3) (i32.sub (call $getPartLength (get_global $command)) (i32.const 3)))))
         ))
         (if (call $compare (call $substr (get_global $command) (i32.const 0) (call $getPartLength (get_global $catCmd))) (get_global $catCmd))(then
           (set_global $mode (i32.const 2))
