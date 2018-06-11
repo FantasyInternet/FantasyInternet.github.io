@@ -2,6 +2,6 @@ The Fantasy Internet
 ====================
 Welcome to cyberspace!
 
-[Download CyberTerminal for Windows!](https://github.com/FantasyInternet/cyberterminal/releases)
+[Download CyberTerminal](https://github.com/FantasyInternet/cyberterminal/releases) and [join the Discord server](https://discord.me/fantasy-internet)!
 
 ![retrowave64](./images/retrowave64.gif)
