@@ -2,6 +2,9 @@
   ;; See API documentation at https://fantasyinternet.github.io/api
   (import "env" "pushFromMemory" (func $pushFromMemory (param $offset i32) (param $length i32)))
   (import "env" "popToMemory" (func $popToMemory (param $offset i32)))
+  (import "env" "logNumber" (func $log1Number (param i32)))
+  (import "env" "logNumber" (func $log2Numbers (param i32) (param i32)))
+  (import "env" "logNumber" (func $log3Numbers (param i32) (param i32) (param i32)))
   (import "env" "print" (func $print ))
   (import "env" "setDisplayMode" (func $setDisplayMode (param $mode i32) (param $width i32) (param $height i32) (param $visibleWidth i32) (param $visibleHeight i32) ))
   (import "env" "shutdown" (func $shutdown ))
@@ -34,7 +37,7 @@
   ;; Linear memory.
   (memory $memory 1)
     (export "memory" (memory $memory))
-    (data (i32.const 0xf100) "\1b[K\n\1b[A #$!> ")
+    (data (i32.const 0xf100) "\1b[K\n\1b[A$ ")
     (data (i32.const 0xf200) "\n")
     (data (i32.const 0xf300) "The command you entered was: ")
     (data (i32.const 0xf400) "ls")
@@ -42,6 +45,7 @@
     (data (i32.const 0xf600) "\nerr!\n\n")
     (data (i32.const 0xf700) "cat ")
     (data (i32.const 0xf800) "less ")
+    (data (i32.const 0xf900) "Commands available:\n\nls\t\tList directory contents.\ncat <filename>\tPrint file contents.\nless <filename>\tPrint file line by line.\n\n")
 
   ;; Global variables
   (global $mode     (mut i32) (i32.const 0))
@@ -72,6 +76,7 @@
     (set_global $lessCmd (call $createString (i32.const 0xf800)))
     (set_global $command (call $createPart (i32.const 0)))
     (set_global $lessFile (call $createPart (i32.const 0)))
+    (call $printStr (call $createString (i32.const 0xf900)))
   )
   (export "init" (func $init))
 
@@ -138,7 +143,6 @@
       (call $resizePart (get_global $lessFile) (get_local $len))
       (call $popToMemory (call $getPartOffset (get_global $lessFile)))
       (set_global $lessLine (i32.const 0))
-      (call $printStr (call $getLine (get_global $lessFile) (get_global $lessLine)))
       (set_global $mode (i32.const 4))
     )(else
       (call $printStr (get_global $err))
@@ -154,7 +158,11 @@
 
   ;; Break function is called whenever Esc is pressed.
   (func $break
-    (call $shutdown)
+    (if (get_global $mode)(then
+      (set_global $mode (i32.const 0))
+    )(else
+      (call $shutdown)
+    ))
   )
   (export "break" (func $break))
 
@@ -257,9 +265,10 @@
       (set_local $col (i32.add (get_local $col) (i32.const 1)))
       (if (i32.eq (call $byteAt (get_local $str) (get_local $p)) (i32.const 10)) (then
         (if (i32.eq (get_local $line) (get_local $linenum)) (then
-          (set_local $p (i32.sub (get_local $p) (get_local $col)))
+          (set_local $p (i32.sub (get_local $p) (i32.sub (get_local $col) (i32.const 1))))
+          (call $log3Numbers (get_local $str) (get_local $p) (get_local $col))
           (set_local $strc (call $substr (get_local $str) (get_local $p) (get_local $col)))
-          (set_local $p (i32.add (get_local $p) (get_local $col)))
+          (set_local $p (i32.add (get_local $p) (i32.sub (get_local $col) (i32.const 1))))
         ))
         (set_local $line (i32.add (get_local $line) (i32.const 1)))
         (set_local $col (i32.const 0))
@@ -267,6 +276,7 @@
       (set_local $p (i32.add (get_local $p) (i32.const 1)))
       (br 0)
     ))
+    ;; (call $log3Numbers (get_local $linenum) (get_local $strc) (call $getPartLength (get_local $strc)))
     (get_local $strc)
   )
 
