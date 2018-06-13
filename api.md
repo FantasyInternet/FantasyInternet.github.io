@@ -19,10 +19,11 @@ The following functions can be imported from the `"env"` field. In a `.wa(s)t`-f
 ### The buffer stack
     pushFromMemory(offset, length)
     popToMemory(offset)
+    getBufferSize(indexFromEnd): length
 
 WebAssembly (wasm) only supports numerical datatypes as function parameters and return types. To pass strings and binary data back and forth, you can use the buffer stack to copy any length of data in and out of linear memory.
 
-The `offset` and `length` parameters specify, in bytes, where in memory the data should be copied. Make sure to allocate enough memory when popping data to memory. Functions that pushes data to the stack usually tell you how many bytes were just pushed.
+The `offset` and `length` parameters specify, in bytes, where in memory the data should be copied. Make sure to allocate enough memory when popping data to memory. Functions that pushes data to the stack usually tell you how many bytes were just pushed. Otherwise you can always call `getBufferSize(0)`.
 
 Parameters and return values that needs to be passed through the buffer stack (and not as actual parameters) will be suffixed with a `$` in this documentation. Functions that return a buffer actually return its length in bytes instead, so you know how much data you can expect to pop off the stack.
 
@@ -111,6 +112,8 @@ Currently `http(s):` and `file:` URL schemes are supported.
     write(path$, data$, callback(success, requestID)): requestID
     delete(path$, callback(success, requestID)): requestID
     list(path$, callback(success, length$, requestID)): requestID
+    head(path$, callback(success, length$, requestID)): requestID
+    post(path$, data$, callback(success, length$, requestID)): requestID
 
     // readImage may be obsoleted in the future.
     // width$ and height$ refer to the same buffer.

@@ -2,9 +2,9 @@ What is the fantasy internet??
 ==============================
 The fantasy internet is a reinvention and re-imagining of the web. It is the cyberspace we used to dream of, but never came to pass.
 
-What would the internet look like, had it been introduced on the good ol' microcomputers of the eighties..?
+What if the web was based solely on [WebAssembly](https://webassembly.org/) and HTML was never invented?
 
-What if HTML was never invented?
+What would the internet look like, had it been introduced on the good ol' microcomputers of the eighties..?
 
 What would a world wide network of arcade machines look like?
 
