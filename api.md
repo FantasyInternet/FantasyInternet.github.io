@@ -19,7 +19,7 @@ The following functions can be imported from the `"env"` field. In a `.wa(s)t`-f
 ### The buffer stack
     pushFromMemory(offset, length)
     popToMemory(offset)
-    getBufferSize(indexFromEnd): length
+    getBufferSize([indexFromEnd]): length
 
 WebAssembly (wasm) only supports numerical datatypes as function parameters and return types. To pass strings and binary data back and forth, you can use the buffer stack to copy any length of data in and out of linear memory.
 
