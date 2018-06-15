@@ -51,7 +51,7 @@ You may have to import `callApiFunction` multiple times for different function s
 These log messages and numbers to the developer console. Useful for debugging.
 
 ### Display
-    // modes: 1=text, 2=pixel
+    // modes: 0=text, 1=pixel
     setDisplayMode(mode, width, height [, visibleWidth, visibleHeight])
     print(string$) // only works in text mode.
     displayMemory(offset, length [, screenOffset]) // only pixel mode.
