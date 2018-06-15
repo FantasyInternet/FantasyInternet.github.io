@@ -51,11 +51,14 @@ You may have to import `callApiFunction` multiple times for different function s
 These log messages and numbers to the developer console. Useful for debugging.
 
 ### Display
+    // modes: 1=text, 2=pixel
     setDisplayMode(mode, width, height [, visibleWidth, visibleHeight])
     print(string$) // only works in text mode.
     displayMemory(offset, length [, screenOffset]) // only pixel mode.
+    getNativeDisplayWidth(): width
+    getNativeDisplayHeight(): height
 
-The API currently supports two display modes: text (mode `0`) and pixels (mode `1`). Each can be any size/resolution you want.
+The API currently supports two display modes: text and pixels. Each can be any size/resolution you want.
 
 Text mode supports the most commonly used ANSI escape codes.
 
