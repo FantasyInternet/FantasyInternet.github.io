@@ -71,7 +71,7 @@ Pixel mode relies on part of linear memory to hold a string of RGBA bytes. 4 byt
     startTone(channel, frequency [, volume [, type]])
     stopTone(channel)
 
-It is recommended to only use `stopTone()` when done you are done playing audio for a while, as it may cause a slight pop in the speakers.
+It is recommended to only use `stopTone()` when you are done playing audio for a while, as it may cause a slight pop in the speakers. For short pauses play a tone on `volume=0`.
 
 ### User input
     focusInput(type) // 1=text, 2=mouse, 3=game.
