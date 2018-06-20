@@ -18,7 +18,7 @@
   (import "env" "getBaseUrl" (func $getBaseUrl (result i32)))
   (import "env" "setBaseUrl" (func $setBaseUrl ))
 
-
+  ;;@require $str "./_wast/strings.wast"
 
 
 

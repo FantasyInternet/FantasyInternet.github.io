@@ -82,19 +82,20 @@ It is recommended to only use `stopTone()` when you are done playing audio for a
     getInputKey(): keyCode
     setInputType(type) // 0=multiline, 1=single, 2=password, 3=number, 4=url, 5=email, 6=phone
     setInputText(text$)
-    setInputPosition(position, length)
+    setInputPosition(position [, length])
     replaceInputText(search$, replace$ [, fromPosition])
 
     getMouseX(): x
     getMouseY(): y
     getMousePressed(): pressed
+    setNativeMouse(visible)
 
     getGameAxisX(): x // -1 to 1
     getGameAxisY(): y // -1 to 1
-    getGameButtonA(): pressed
-    getGameButtonB(): pressed
-    getGameButtonX(): pressed
-    getGameButtonY(): pressed
+    getGameButtonA(): pressed // Action
+    getGameButtonB(): pressed // Bounce
+    getGameButtonX(): pressed // auXiliary
+    getGameButtonY(): pressed // Yield
 
 Input from the user can be prioritized depending on context. This is useful on mobile devices with touchscreen as focusing on a specific type of input may produce an onscreen keyboard, touch controls etc..
 
