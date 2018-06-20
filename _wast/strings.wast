@@ -1,5 +1,6 @@
 (import "env" "pushFromMemory" (func $fi.pushFromMemory (param i32) (param i32) ))
 (import "env" "popToMemory" (func $fi.popToMemory (param i32) ))
+(import "env" "getBufferSize" (func $fi.getBufferSize ))
 (import "env" "print" (func $fi.print ))
 ;;@require $mem "./memory.wast"
 
@@ -91,9 +92,9 @@
     (set_local $col (i32.add (get_local $col) (i32.const 1)))
     (if (i32.eq (call $byteAt (get_local $str) (get_local $p)) (i32.const 10)) (then
       (if (i32.eq (get_local $line) (get_local $linenum)) (then
-        (set_local $p (i32.sub (get_local $p) (get_local $col)))
+        (set_local $p (i32.sub (get_local $p) (i32.sub (get_local $col) (i32.const 1))))
         (set_local $strc (call $substr (get_local $str) (get_local $p) (get_local $col)))
-        (set_local $p (i32.add (get_local $p) (get_local $col)))
+        (set_local $p (i32.add (get_local $p) (i32.sub (get_local $col) (i32.const 1))))
       ))
       (set_local $line (i32.add (get_local $line) (i32.const 1)))
       (set_local $col (i32.const 0))
@@ -243,3 +244,13 @@
   (call $mem.resizePart (get_local $str) (get_local $l))
 )
 
+(func $pushString (param $str i32)
+  (call $fi.pushFromMemory (call $mem.getPartOffset (get_local $str)) (call $mem.getPartLength (get_local $str)))
+)
+
+(func $popString (result i32)
+  (local $str i32)
+  (set_local $str (call $mem.createPart (call $fi.getBufferSize)))
+  (call $fi.popToMemory (call $mem.getPartOffset (get_local $str)))
+  (get_local $str)
+)
