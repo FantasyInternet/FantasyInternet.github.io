@@ -1,0 +1,23 @@
+{
+  "name": "fantasyinternet.github.io",
+  "version": "0.1.5",
+  "description": "Who needs HTML when you've got WebAssembly..? Welcome to cyberspace!",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FantasyInternet/FantasyInternet.github.io.git"
+  },
+  "author": "codeartisticninja",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FantasyInternet/FantasyInternet.github.io/issues"
+  },
+  "homepage": "https://github.com/FantasyInternet/FantasyInternet.github.io#readme",
+  "devDependencies": {
+    "file-watch": "^0.1.0",
+    "wabt": "^1.0.0",
+    "waquire": "^0.2.0"
+  }
+}

@@ -2,3 +2,4 @@
 Thumbs.db
 *~
 *.kra-autosave.kra
+node_modules/
