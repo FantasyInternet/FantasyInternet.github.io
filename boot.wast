@@ -19,6 +19,7 @@
   (import "env" "setBaseUrl" (func $setBaseUrl ))
 
   ;;@require $str "./_wast/strings.wast"
+  ;;@require $mem "./_wast/memory.wast"
 
 
 
@@ -64,102 +65,102 @@
     (call $setStepInterval (i32.const -1)) ;; step only on keypress
     (call $setDisplayMode (i32.const 0) (i32.const 80) (i32.const 20) (i32.const 80) (i32.const 20))
     (call $setInputType (i32.const 1))
-    (set_global $prompt (call $createString (i32.const 0xf100)))
-    (set_global $nl (call $createString (i32.const 0xf200)))
-    (set_global $confirm (call $createString (i32.const 0xf300)))
-    (set_global $lsCmd (call $createString (i32.const 0xf400)))
-    (set_global $cwd (call $createString (i32.const 0xf500)))
-    (set_global $err (call $createString (i32.const 0xf600)))
-    (set_global $catCmd (call $createString (i32.const 0xf700)))
-    (set_global $lessCmd (call $createString (i32.const 0xf800)))
-    (set_global $cdCmd (call $createString (i32.const 0xfa00)))
-    (set_global $prompt2 (call $createString (i32.const 0xfb00)))
+    (set_global $prompt (call $str.createString (i32.const 0xf100)))
+    (set_global $nl (call $str.createString (i32.const 0xf200)))
+    (set_global $confirm (call $str.createString (i32.const 0xf300)))
+    (set_global $lsCmd (call $str.createString (i32.const 0xf400)))
+    (set_global $cwd (call $str.createString (i32.const 0xf500)))
+    (set_global $err (call $str.createString (i32.const 0xf600)))
+    (set_global $catCmd (call $str.createString (i32.const 0xf700)))
+    (set_global $lessCmd (call $str.createString (i32.const 0xf800)))
+    (set_global $cdCmd (call $str.createString (i32.const 0xfa00)))
+    (set_global $prompt2 (call $str.createString (i32.const 0xfb00)))
     
-    (set_global $command (call $createPart (i32.const 0)))
-    (set_global $lessFile (call $createPart (i32.const 0)))
-    (call $printStr (call $createString (i32.const 0xf900)))
+    (set_global $command (call $mem.createPart (i32.const 0)))
+    (set_global $lessFile (call $mem.createPart (i32.const 0)))
+    (call $str.printStr (call $str.createString (i32.const 0xf900)))
   )
   (export "init" (func $init))
 
   ;; Step function is called once every interval.
   (func $step (param $t f64)
-    (call $enterPart (call $createPart (i32.const 1)))
+    (call $mem.enterPart (call $mem.createPart (i32.const 1)))
     (if (i32.eq (get_global $mode) (i32.const 0))(then
-      (call $printStr (get_global $prompt))
+      (call $str.printStr (get_global $prompt))
       (call $print (drop (call $getBaseUrl)))
-      (call $printStr (get_global $prompt2))
+      (call $str.printStr (get_global $prompt2))
       (call $print (drop (call $getInputText)))
       (if (i32.eq (call $getInputKey) (i32.const 13))(then
-        (call $printStr (get_global $nl))
-        (call $resizePart (get_global $command) (call $getInputText))
-        (call $popToMemory (call $getPartOffset (get_global $command)))
+        (call $str.printStr (get_global $nl))
+        (call $mem.resizePart (get_global $command) (call $getInputText))
+        (call $popToMemory (call $mem.getPartOffset (get_global $command)))
         (call $setInputText (call $pushFromMemory (i32.const 0) (i32.const 0)))
-        (call $printStr (get_global $nl))
-        (if (call $compare (get_global $command) (get_global $lsCmd))(then
+        (call $str.printStr (get_global $nl))
+        (if (call $str.compare (get_global $command) (get_global $lsCmd))(then
           (set_global $mode (i32.const 1))
         ))
-        (if (call $compare (call $substr (get_global $command) (i32.const 0) (call $getPartLength (get_global $cdCmd))) (get_global $cdCmd))(then
-          (call $setBaseUrl (call $pushString (call $substr (get_global $command) (i32.const 3) (i32.sub (call $getPartLength (get_global $command)) (i32.const 3)))))
+        (if (call $str.compare (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $cdCmd))) (get_global $cdCmd))(then
+          (call $setBaseUrl (call $str.pushString (call $str.substr (get_global $command) (i32.const 3) (i32.sub (call $mem.getPartLength (get_global $command)) (i32.const 3)))))
         ))
-        (if (call $compare (call $substr (get_global $command) (i32.const 0) (call $getPartLength (get_global $catCmd))) (get_global $catCmd))(then
+        (if (call $str.compare (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $catCmd))) (get_global $catCmd))(then
           (set_global $mode (i32.const 2))
         ))
-        (if (call $compare (call $substr (get_global $command) (i32.const 0) (call $getPartLength (get_global $lessCmd))) (get_global $lessCmd))(then
+        (if (call $str.compare (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $lessCmd))) (get_global $lessCmd))(then
           (set_global $mode (i32.const 3))
         ))
       ))
     ))
     (if (i32.eq (get_global $mode) (i32.const 1))(then
-      (drop (call $list (call $pushString (get_global $cwd)) (i32.const 1)))
+      (drop (call $list (call $str.pushString (get_global $cwd)) (i32.const 1)))
       (set_global $mode (i32.const -1))
     ))
     (if (i32.eq (get_global $mode) (i32.const 2))(then
-      (drop (call $read (call $pushString (call $substr (get_global $command) (i32.const 4) (i32.sub (call $getPartLength (get_global $command)) (i32.const 4)))) (i32.const 1)))
+      (drop (call $read (call $str.pushString (call $str.substr (get_global $command) (i32.const 4) (i32.sub (call $mem.getPartLength (get_global $command)) (i32.const 4)))) (i32.const 1)))
       (set_global $mode (i32.const -1))
     ))
     (if (i32.eq (get_global $mode) (i32.const 3))(then
-      (drop (call $read (call $pushString (call $substr (get_global $command) (i32.const 5) (i32.sub (call $getPartLength (get_global $command)) (i32.const 5)))) (i32.const 2)))
+      (drop (call $read (call $str.pushString (call $str.substr (get_global $command) (i32.const 5) (i32.sub (call $mem.getPartLength (get_global $command)) (i32.const 5)))) (i32.const 2)))
       (set_global $mode (i32.const -1))
     ))
     (if (i32.eq (get_global $mode) (i32.const 4))(then
       (if (i32.eq (call $getInputKey) (i32.const 13))(then
-        (call $printStr (call $getLine (get_global $lessFile) (get_global $lessLine)))
+        (call $str.printStr (call $str.getLine (get_global $lessFile) (get_global $lessLine)))
         (set_global $lessLine (i32.add (get_global $lessLine) (i32.const 1)))
-        (if (i32.ge_u (get_global $lessLine) (call $countLines (get_global $lessFile)))(then
-          (call $printStr (get_global $nl))
+        (if (i32.ge_u (get_global $lessLine) (call $str.countLines (get_global $lessFile)))(then
+          (call $str.printStr (get_global $nl))
           (set_global $mode (i32.const 0))
         ))
       ))
     ))
-    (call $deleteParent)
+    (call $mem.deleteParent)
   )
   (export "step" (func $step))
 
   (func $dump (param $success i32) (param $len i32) (param $req i32)
-    (call $enterPart (call $createPart (i32.const 1)))
+    (call $mem.enterPart (call $mem.createPart (i32.const 1)))
     (if (get_local $success) (then
-      (call $printStr (call $popString (get_local $len)))
-      (call $printStr (get_global $nl))
-      (call $printStr (get_global $nl))
+      (call $str.printStr (call $str.popString ))
+      (call $str.printStr (get_global $nl))
+      (call $str.printStr (get_global $nl))
     )(else
-      (call $printStr (get_global $err))
+      (call $str.printStr (get_global $err))
     ))
     (set_global $mode (i32.const 0))
-    (call $deleteParent)
+    (call $mem.deleteParent)
   )
 
   (func $loadLess (param $success i32) (param $len i32) (param $req i32)
-    (call $enterPart (call $createPart (i32.const 1)))
+    (call $mem.enterPart (call $mem.createPart (i32.const 1)))
     (if (get_local $success) (then
-      (call $resizePart (get_global $lessFile) (get_local $len))
-      (call $popToMemory (call $getPartOffset (get_global $lessFile)))
+      (call $mem.resizePart (get_global $lessFile) (get_local $len))
+      (call $popToMemory (call $mem.getPartOffset (get_global $lessFile)))
       (set_global $lessLine (i32.const 0))
       (set_global $mode (i32.const 4))
     )(else
-      (call $printStr (get_global $err))
+      (call $str.printStr (get_global $err))
       (set_global $mode (i32.const 0))
     ))
-    (call $deleteParent)
+    (call $mem.deleteParent)
   )
 
 

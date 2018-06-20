@@ -1,6 +1,6 @@
 (import "env" "pushFromMemory" (func $fi.pushFromMemory (param i32) (param i32) ))
 (import "env" "popToMemory" (func $fi.popToMemory (param i32) ))
-(import "env" "getBufferSize" (func $fi.getBufferSize ))
+(import "env" "getBufferSize" (func $fi.getBufferSize (result i32)))
 (import "env" "print" (func $fi.print ))
 ;;@require $mem "./memory.wast"
 
