@@ -18,8 +18,9 @@
   (import "env" "getBaseUrl" (func $getBaseUrl (result i32)))
   (import "env" "setBaseUrl" (func $setBaseUrl ))
 
-  ;;@require $str "./_wast/strings.wast"
-  ;;@require $mem "./_wast/memory.wast"
+  ;;@require $mem "fantasyinternet.wast/memory.wast"
+  ;;@require $str "fantasyinternet.wast/strings.wast"
+  ;;@require $cli "_wast/cli.wast"
 
 
 
@@ -96,16 +97,16 @@
         (call $popToMemory (call $mem.getPartOffset (get_global $command)))
         (call $setInputText (call $pushFromMemory (i32.const 0) (i32.const 0)))
         (call $str.printStr (get_global $nl))
-        (if (call $str.compare (get_global $command) (get_global $lsCmd))(then
+        (if (call $str.equal (get_global $command) (get_global $lsCmd))(then
           (set_global $mode (i32.const 1))
         ))
-        (if (call $str.compare (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $cdCmd))) (get_global $cdCmd))(then
+        (if (call $str.equal (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $cdCmd))) (get_global $cdCmd))(then
           (call $setBaseUrl (call $str.pushString (call $str.substr (get_global $command) (i32.const 3) (i32.sub (call $mem.getPartLength (get_global $command)) (i32.const 3)))))
         ))
-        (if (call $str.compare (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $catCmd))) (get_global $catCmd))(then
+        (if (call $str.equal (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $catCmd))) (get_global $catCmd))(then
           (set_global $mode (i32.const 2))
         ))
-        (if (call $str.compare (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $lessCmd))) (get_global $lessCmd))(then
+        (if (call $str.equal (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $lessCmd))) (get_global $lessCmd))(then
           (set_global $mode (i32.const 3))
         ))
       ))
