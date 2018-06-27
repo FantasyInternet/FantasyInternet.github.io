@@ -39,10 +39,10 @@
     (data (i32.const 0xf400) "ls")
     (data (i32.const 0xf500) "./")
     (data (i32.const 0xf600) "\nerr!\n\n")
-    (data (i32.const 0xf700) "cat ")
-    (data (i32.const 0xf800) "less ")
+    (data (i32.const 0xf700) "cat")
+    (data (i32.const 0xf800) "less")
     (data (i32.const 0xf900) "Commands available:\n\ncd <dir>/\tChange directory.\nls\t\tList directory contents.\ncat <filename>\tPrint file contents.\nless <filename>\tPrint file line by line.\n\n")
-    (data (i32.const 0xfa00) "cd ")
+    (data (i32.const 0xfa00) "cd")
     (data (i32.const 0xfb00) "> ")
 
   ;; Global variables
@@ -86,20 +86,23 @@
 
   ;; Step function is called once every interval.
   (func $step (param $t f64)
+    (local $s i32)
     (call $mem.enterPart (call $mem.createPart (i32.const 1)))
     (if (i32.eq (get_global $mode) (i32.const 0))(then
       (set_global $command (call $cli.step))
       (if (get_global $command)(then
-        (if (call $str.equal (get_global $command) (get_global $lsCmd))(then
+        (if (call $str.equal (call $cli.getArg (i32.const 0)) (get_global $lsCmd))(then
           (set_global $mode (i32.const 1))
         ))
-        (if (call $str.equal (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $cdCmd))) (get_global $cdCmd))(then
-          (call $setBaseUrl (call $str.pushString (call $str.substr (get_global $command) (i32.const 3) (i32.sub (call $mem.getPartLength (get_global $command)) (i32.const 3)))))
+        (if (call $str.equal (call $cli.getArg (i32.const 0)) (get_global $cdCmd))(then
+          (set_local $s (call $cli.getArg (i32.const 1)))
+          (call $str.appendBytes (get_local $s) (i64.const 0x2f))
+          (call $setBaseUrl (call $str.pushString (get_local $s)))
         ))
-        (if (call $str.equal (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $catCmd))) (get_global $catCmd))(then
+        (if (call $str.equal (call $cli.getArg (i32.const 0)) (get_global $catCmd))(then
           (set_global $mode (i32.const 2))
         ))
-        (if (call $str.equal (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $lessCmd))) (get_global $lessCmd))(then
+        (if (call $str.equal (call $cli.getArg (i32.const 0)) (get_global $lessCmd))(then
           (set_global $mode (i32.const 3))
         ))
         (if (i32.eqz (get_global $mode))(then
@@ -112,15 +115,15 @@
       (set_global $mode (i32.const -1))
     ))
     (if (i32.eq (get_global $mode) (i32.const 2))(then
-      (drop (call $read (call $str.pushString (call $str.substr (get_global $command) (i32.const 4) (i32.sub (call $mem.getPartLength (get_global $command)) (i32.const 4)))) (i32.const 1)))
+      (drop (call $read (call $str.pushString (call $cli.getArg (i32.const 1))) (i32.const 1)))
       (set_global $mode (i32.const -1))
     ))
     (if (i32.eq (get_global $mode) (i32.const 3))(then
-      (drop (call $read (call $str.pushString (call $str.substr (get_global $command) (i32.const 5) (i32.sub (call $mem.getPartLength (get_global $command)) (i32.const 5)))) (i32.const 2)))
+      (drop (call $read (call $str.pushString (call $cli.getArg (i32.const 1))) (i32.const 2)))
       (set_global $mode (i32.const -1))
     ))
     (if (i32.eq (get_global $mode) (i32.const 4))(then
-      (if (i32.eq (call $getInputKey) (i32.const 13))(then
+      (if (call $getInputKey) (then
         (call $str.printStr (call $str.getLine (get_global $lessFile) (get_global $lessLine)))
         (set_global $lessLine (i32.add (get_global $lessLine) (i32.const 1)))
         (if (i32.ge_u (get_global $lessLine) (call $str.countLines (get_global $lessFile)))(then
@@ -161,6 +164,7 @@
   )
 
   (func $gotoPrompt
+    (call $setInputText (call $pushFromMemory (i32.const 0) (i32.const 0)))
     (call $print (drop (call $getBaseUrl)))
     (call $str.printStr (get_global $prompt2))
     (set_global $mode (i32.const 0))

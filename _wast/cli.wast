@@ -84,3 +84,42 @@
   (call $mem.deleteParent)
 )
 
+(func $getArg (param $num i32) (result i32)
+  (local $arg i32)
+  (local $pos i32)
+  (local $len i32)
+  (local $end i32)
+  (local $chr i32)
+  (set_local $arg (call $mem.createPart (i32.const 0)))
+  (set_local $len (call $mem.getPartLength (get_global $input)))
+  (block(loop
+    (br_if 1 (i32.eqz (get_local $len)))
+    (set_local $len (i32.sub (get_local $len) (i32.const 1)))
+    (set_local $chr (call $str.byteAt (get_global $input) (get_local $pos)))
+    (if (i32.and (i32.eqz (get_local $end)) (i32.gt_u (get_local $chr) (i32.const 0x20)))(then
+      (if (i32.eq (get_local $chr) (i32.const 0x22))(then
+        (set_local $end (get_local $chr))
+        (set_local $pos (i32.add (get_local $pos) (i32.const 1)))
+        (if (get_local $len) (set_local $len (i32.sub (get_local $len) (i32.const 1))))
+        (set_local $chr (call $str.byteAt (get_global $input) (get_local $pos)))
+      )(else
+        (set_local $end (i32.const 0x20))
+      ))
+    ))
+    (if (i32.eq (get_local $chr) (get_local $end))(then
+      (set_local $end (i32.const 0))
+      (set_local $num (i32.sub (get_local $num) (i32.const 1)))
+    ))
+    (if (i32.eq (get_local $chr) (i32.const 0x5c))(then
+      (set_local $pos (i32.add (get_local $pos) (i32.const 1)))
+      (if (get_local $len) (set_local $len (i32.sub (get_local $len) (i32.const 1))))
+      (set_local $chr (call $str.byteAt (get_global $input) (get_local $pos)))
+    ))
+    (if (i32.and (i32.gt_u (get_local $end) (i32.const 0)) (i32.eqz (get_local $num)))(then
+      (call $str.appendBytes (get_local $arg) (i64.extend_u/i32 (get_local $chr)))
+    ))
+    (set_local $pos (i32.add (get_local $pos) (i32.const 1)))
+    (br 0)
+  ))
+  (get_local $arg)
+)
