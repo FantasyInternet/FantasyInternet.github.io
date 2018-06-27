@@ -2,6 +2,7 @@
 (import "env" "popToMemory" (func $popToMemory (param $offset i32)))
 (import "env" "getInputText" (func $getInputText (result i32)))
 (import "env" "getInputPosition" (func $getInputPosition (result i32)))
+(import "env" "getInputSelected" (func $getInputSelected (result i32)))
 (import "env" "getInputKey" (func $getInputKey (result i32)))
 (import "env" "setInputText" (func $setInputText ))
 (import "env" "print" (func $print ))
@@ -13,12 +14,16 @@
 (global $save (mut i32) (i32.const 0))
 (global $clear (mut i32) (i32.const 0))
 (global $nl (mut i32) (i32.const 0))
+(global $selstart (mut i32) (i32.const 0))
+(global $selend (mut i32) (i32.const 0))
 (global $input (mut i32) (i32.const 0))
 
 (func $step (result i32)
   (local $key i32)
   (local $result i32)
-  (call $mem.enterPart (call $mem.createPart (i32.const 0)))
+  (local $parentPart i32)
+  (set_local $parentPart (get_global $mem.parentPart))
+  (set_global $mem.parentPart (i32.const 0))
   (if (i32.eqz (get_global $restore))(then
     (set_global $restore (call $mem.createPart (i32.const 0)))
     (call $str.appendBytes (get_global $restore) (i64.const 0x755b1b))
@@ -29,17 +34,28 @@
   ))
   (if (i32.eqz (get_global $clear))(then
     (set_global $clear (call $mem.createPart (i32.const 0)))
-    (call $str.appendBytes (get_global $clear) (i64.const 0x4b5b1b))
+    (call $str.appendBytes (get_global $clear) (i64.const 0x4a5b1b))
   ))
   (if (i32.eqz (get_global $nl))(then
     (set_global $nl (call $mem.createPart (i32.const 0)))
     (call $str.appendBytes (get_global $nl) (i64.const 0x0a))
   ))
+  (if (i32.eqz (get_global $selstart))(then
+    (set_global $selstart (call $mem.createPart (i32.const 0)))
+    (call $str.appendBytes (get_global $selstart) (i64.const 0x6d315b1b))
+  ))
+  (if (i32.eqz (get_global $selend))(then
+    (set_global $selend (call $mem.createPart (i32.const 0)))
+    (call $str.appendBytes (get_global $selend) (i64.const 0x6d305b1b))
+  ))
   (if (i32.eqz (get_global $input))(then
     (set_global $input (call $mem.createPart (i32.const 0)))
   ))
+  (set_global $mem.parentPart (get_local $parentPart))
+  (call $mem.enterPart (call $mem.createPart (i32.const 0)))
   (call $mem.resizePart (get_global $input) (call $getInputText))
   (call $popToMemory (call $mem.getPartOffset (get_global $input)))
+  (call $str.usascii (get_global $input))
   (set_local $key (call $getInputKey))
   (if (get_local $key)(then
     (if (i32.eq (get_local $key) (i32.const 13))(then
@@ -51,8 +67,14 @@
       (call $str.printStr (get_global $nl))
       (set_local $result (get_global $input))
     )(else
+      (call $str.printStr (get_global $restore))
       (call $str.printStr (get_global $save))
-      (call $str.printStr (call $str.substr (get_global $input) (call $getInputPosition) (i32.sub (call $mem.getPartLength (get_global $input)) (call $getInputPosition))))
+      (call $str.printStr (call $str.substr (get_global $input) (i32.const 0) (call $getInputPosition)))
+      (call $str.printStr (get_global $save))
+      (call $str.printStr (get_global $selstart))
+      (call $str.printStr (call $str.substr (get_global $input) (call $getInputPosition) (call $getInputSelected)))
+      (call $str.printStr (get_global $selend))
+      (call $str.printStr (call $str.substr (get_global $input) (i32.add (call $getInputPosition) (call $getInputSelected)) (i32.sub (call $mem.getPartLength (get_global $input)) (i32.add (call $getInputPosition) (call $getInputSelected)))))
       (call $str.printStr (get_global $clear))
       (call $str.printStr (get_global $restore))
       (set_local $result (i32.const 0))

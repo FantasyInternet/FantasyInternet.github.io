@@ -43,7 +43,7 @@
     (data (i32.const 0xf800) "less ")
     (data (i32.const 0xf900) "Commands available:\n\ncd <dir>/\tChange directory.\nls\t\tList directory contents.\ncat <filename>\tPrint file contents.\nless <filename>\tPrint file line by line.\n\n")
     (data (i32.const 0xfa00) "cd ")
-    (data (i32.const 0xfb00) " > ")
+    (data (i32.const 0xfb00) "> ")
 
   ;; Global variables
   (global $mode     (mut i32) (i32.const 0))
@@ -80,6 +80,7 @@
     (set_global $command (call $mem.createPart (i32.const 0)))
     (set_global $lessFile (call $mem.createPart (i32.const 0)))
     (call $str.printStr (call $str.createString (i32.const 0xf900)))
+    (call $gotoPrompt)
   )
   (export "init" (func $init))
 
@@ -87,16 +88,8 @@
   (func $step (param $t f64)
     (call $mem.enterPart (call $mem.createPart (i32.const 1)))
     (if (i32.eq (get_global $mode) (i32.const 0))(then
-      (call $str.printStr (get_global $prompt))
-      (call $print (drop (call $getBaseUrl)))
-      (call $str.printStr (get_global $prompt2))
-      (call $print (drop (call $getInputText)))
-      (if (i32.eq (call $getInputKey) (i32.const 13))(then
-        (call $str.printStr (get_global $nl))
-        (call $mem.resizePart (get_global $command) (call $getInputText))
-        (call $popToMemory (call $mem.getPartOffset (get_global $command)))
-        (call $setInputText (call $pushFromMemory (i32.const 0) (i32.const 0)))
-        (call $str.printStr (get_global $nl))
+      (set_global $command (call $cli.step))
+      (if (get_global $command)(then
         (if (call $str.equal (get_global $command) (get_global $lsCmd))(then
           (set_global $mode (i32.const 1))
         ))
@@ -108,6 +101,9 @@
         ))
         (if (call $str.equal (call $str.substr (get_global $command) (i32.const 0) (call $mem.getPartLength (get_global $lessCmd))) (get_global $lessCmd))(then
           (set_global $mode (i32.const 3))
+        ))
+        (if (i32.eqz (get_global $mode))(then
+          (call $gotoPrompt)
         ))
       ))
     ))
@@ -129,7 +125,7 @@
         (set_global $lessLine (i32.add (get_global $lessLine) (i32.const 1)))
         (if (i32.ge_u (get_global $lessLine) (call $str.countLines (get_global $lessFile)))(then
           (call $str.printStr (get_global $nl))
-          (set_global $mode (i32.const 0))
+          (call $gotoPrompt)
         ))
       ))
     ))
@@ -146,7 +142,7 @@
     )(else
       (call $str.printStr (get_global $err))
     ))
-    (set_global $mode (i32.const 0))
+    (call $gotoPrompt)
     (call $mem.deleteParent)
   )
 
@@ -159,9 +155,15 @@
       (set_global $mode (i32.const 4))
     )(else
       (call $str.printStr (get_global $err))
-      (set_global $mode (i32.const 0))
+      (call $gotoPrompt)
     ))
     (call $mem.deleteParent)
+  )
+
+  (func $gotoPrompt
+    (call $print (drop (call $getBaseUrl)))
+    (call $str.printStr (get_global $prompt2))
+    (set_global $mode (i32.const 0))
   )
 
 
@@ -173,7 +175,7 @@
   ;; Break function is called whenever Esc is pressed.
   (func $break
     (if (get_global $mode)(then
-      (set_global $mode (i32.const 0))
+      (call $gotoPrompt)
     )(else
       (call $shutdown)
     ))

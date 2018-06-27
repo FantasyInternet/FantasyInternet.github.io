@@ -3,7 +3,7 @@
   "version": "0.1.5",
   "description": "Who needs HTML when you've got WebAssembly..? Welcome to cyberspace!",
   "scripts": {
-    "build": "node build.js"
+    "watch": "node build.js"
   },
   "repository": {
     "type": "git",
