@@ -94,7 +94,7 @@ It is recommended to only use `stopTone()` when you are done playing audio for a
     getGameAxisY(): y // -1 to 1
     getGameButtonA(): pressed // Action
     getGameButtonB(): pressed // Bounce
-    getGameButtonX(): pressed // auXiliary
+    getGameButtonX(): pressed // Xtra
     getGameButtonY(): pressed // Yield
 
 Input from the user can be prioritized depending on context. This is useful on mobile devices with touchscreen as focusing on a specific type of input may produce an onscreen keyboard, touch controls etc..
