@@ -6,9 +6,11 @@
   (import "env" "logNumber" (func $log2Numbers (param i32) (param i32)))
   (import "env" "logNumber" (func $log3Numbers (param i32) (param i32) (param i32)))
   (import "env" "print" (func $print ))
-  (import "env" "setDisplayMode" (func $setDisplayMode (param $mode i32) (param $width i32) (param $height i32) (param $visibleWidth i32) (param $visibleHeight i32) ))
+  (import "env" "setDisplayMode" (func $setDisplayMode (param $mode i32) (param $width i32) (param $height i32)  ))
+  (import "env" "displayMemory" (func $displayMemory (param $offset i32) (param $length i32)))
   (import "env" "shutdown" (func $shutdown ))
   (import "env" "read" (func $read (param $tableIndex i32) (result i32)))
+  (import "env" "readImage" (func $readImage (param $tableIndex i32) (result i32)))
   (import "env" "list" (func $list (param $tableIndex i32) (result i32)))
   (import "env" "setStepInterval" (func $setStepInterval (param $milliseconds i32)))
   (import "env" "setInputType" (func $setInputType (param $type i32)))
@@ -20,7 +22,9 @@
 
   ;;@require $mem "fantasyinternet.wast/memory.wast"
   ;;@require $str "fantasyinternet.wast/strings.wast"
-  ;;@require $cli "_wast/cli.wast"
+  ;;@require $cli "fantasyinternet.wast/cli.wast"
+  ;;@require $utf8 "fantasyinternet.wast/utf8.wast"
+  ;;@require $gfx "fantasyinternet.wast/graphics.wast"
 
 
 
@@ -28,6 +32,7 @@
   (table $table 8 anyfunc)
     (elem (i32.const 1) $dump)
     (elem (i32.const 2) $loadLess)
+    (elem (i32.const 3) $loadImg)
     (export "table" (table $table))
 
   ;; Linear memory.
@@ -41,9 +46,10 @@
     (data (i32.const 0xf600) "\nerr!\n\n")
     (data (i32.const 0xf700) "cat")
     (data (i32.const 0xf800) "less")
-    (data (i32.const 0xf900) "Commands available:\n\ncd <dir>/\tChange directory.\nls\t\tList directory contents.\ncat <filename>\tPrint file contents.\nless <filename>\tPrint file line by line.\n\n")
+    (data (i32.const 0xf900) "Commands available:\n\ncd <dir>\tChange directory.\nls\t\tList directory contents.\ncat <filename>\tPrint file contents.\nless <filename>\tPrint file line by line.\nshow <filename>\tShow image file.\n\n")
     (data (i32.const 0xfa00) "cd")
     (data (i32.const 0xfb00) "> ")
+    (data (i32.const 0xfc00) "show")
 
   ;; Global variables
   (global $mode     (mut i32) (i32.const 0))
@@ -60,11 +66,12 @@
   (global $lessFile (mut i32) (i32.const 0))
   (global $lessLine (mut i32) (i32.const 0))
   (global $cdCmd    (mut i32) (i32.const 0))
+  (global $showCmd  (mut i32) (i32.const 0))
 
   ;; Init function is called once on start.
   (func $init
     (call $setStepInterval (i32.const -1)) ;; step only on keypress
-    (call $setDisplayMode (i32.const 0) (i32.const 80) (i32.const 20) (i32.const 80) (i32.const 20))
+    (call $setDisplayMode (i32.const 0) (i32.const 80) (i32.const 20) )
     (call $setInputType (i32.const 1))
     (set_global $prompt (call $str.createString (i32.const 0xf100)))
     (set_global $nl (call $str.createString (i32.const 0xf200)))
@@ -76,6 +83,7 @@
     (set_global $lessCmd (call $str.createString (i32.const 0xf800)))
     (set_global $cdCmd (call $str.createString (i32.const 0xfa00)))
     (set_global $prompt2 (call $str.createString (i32.const 0xfb00)))
+    (set_global $showCmd (call $str.createString (i32.const 0xfc00)))
     
     (set_global $command (call $mem.createPart (i32.const 0)))
     (set_global $lessFile (call $mem.createPart (i32.const 0)))
@@ -105,6 +113,9 @@
         (if (call $str.equal (call $cli.getArg (i32.const 0)) (get_global $lessCmd))(then
           (set_global $mode (i32.const 3))
         ))
+        (if (call $str.equal (call $cli.getArg (i32.const 0)) (get_global $showCmd))(then
+          (set_global $mode (i32.const 5))
+        ))
         (if (i32.eqz (get_global $mode))(then
           (call $gotoPrompt)
         ))
@@ -131,6 +142,15 @@
           (call $gotoPrompt)
         ))
       ))
+    ))
+    (if (i32.eq (get_global $mode) (i32.const 5))(then
+      (drop (call $readImage (call $str.pushString (call $cli.getArg (i32.const 1))) (i32.const 3)))
+      (set_global $mode (i32.const -1))
+    ))
+    (if (i32.eq (get_global $mode) (i32.const 6))(then
+      (if (call $getInputKey) (then
+        (call $gotoPrompt)
+      ))  
     ))
     (call $mem.deleteParent)
   )
@@ -163,7 +183,23 @@
     (call $mem.deleteParent)
   )
 
+  (func $loadImg (param $success i32) (param $w i32) (param $h i32) (param $req i32)
+    (local $im i32)
+    (call $mem.enterPart (call $mem.createPart (i32.const 1)))
+    (if (get_local $success) (then
+      (set_local $im (call $gfx.createImg (get_local $w) (get_local $h)))
+      (call $popToMemory (i32.add (i32.const 8) (call $mem.getPartOffset (get_local $im))))
+      (call $setDisplayMode (i32.const 1) (get_local $w) (get_local $h))
+      (call $displayMemory (i32.add (i32.const 8) (call $mem.getPartOffset (get_local $im))) (i32.sub (call $mem.getPartLength (get_local $im)) (i32.const 8)))
+    )(else
+      (call $str.printStr (get_global $err))
+      (call $gotoPrompt)
+    ))
+    (call $mem.deleteParent)
+  )
+
   (func $gotoPrompt
+    (call $setDisplayMode (i32.const 0) (i32.const 80) (i32.const 20))
     (call $setInputText (call $pushFromMemory (i32.const 0) (i32.const 0)))
     (call $print (drop (call $getBaseUrl)))
     (call $str.printStr (get_global $prompt2))
