@@ -102,12 +102,13 @@ Input from the user can be prioritized depending on context. This is useful on m
 ### Navigation
     connectTo(url$)
     shutdown()
+    getOriginUrl(): url$
     getBaseUrl(): url$
     setBaseUrl(url$)
 
 The navigation system is (primarily) stack based. Connecting to a URL suspends the current connection and adds a new one to the navigation stack. Shutdown terminates the current connection (deleting its state and memory), pops it off the stack and returns control to the previous connection.
 
-The URL connected to will be the initial base URL, where any relative URLs are resolved from. This is useful for creating permalinks that boots straight into a specific resource. Only resources residing in the same folder as `boot.wasm` (or subfolders) can be accessed.
+The URL connected to will be the initial base URL, where any relative URLs are resolved from. This is useful for creating permalinks that boots straight into a specific resource. Only resources residing in the same folder as `boot.wasm` (the origin) can be accessed.
 
 Currently `http(s):` and `file:` URL schemes are supported.
 
@@ -132,12 +133,13 @@ If the operation fails, `success` will be zero and nothing will be pushed to the
 ### Process handling
     setStepInterval(milliseconds) // Set to -1 to only step on input.
     loadProcess(wasmBinary$): processID
+    processStatus(processID): state // 1=initializing, 2=ready, -1=error
     stepProcess(processID)
     callbackProcess(processID, tableIndex [, params...]): [returnValue]
     killProcess(processID)
     transferMemory(fromPID, fromOffset, length, toPID, toOffset)
 
-The `boot.wasm` file can load and run other `.wasm`-files. Any functions exported by `boot.wasm` that starts with `"api."` will be importable by any process it loads.
+The `boot.wasm` file can load and run other `.wasm`-files. Any functions exported by `boot.wasm` that starts with `"env."` will be importable by any process it loads.
 
 ### Math
     (import "Math" "random" (func $random (result f32)))

@@ -6,7 +6,7 @@ const
 
 const watcher = new Watcher({
   root: __dirname,
-  filter: (filename) => filename.substr(-4) === "wast"
+  filter: (filename, stat) => filename === "cmd" || filename.substr(-4) === "wast"
 })
 
 const wastModules = []
