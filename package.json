@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/FantasyInternet/FantasyInternet.github.io#readme",
   "devDependencies": {
-    "fantasyinternet.wast": "^0.0.4",
+    "fantasyinternet.wast": "0.0.5",
     "file-watcher": "^0.0.2",
     "wabt": "^1.0.0",
     "waquire": "^0.3.1"

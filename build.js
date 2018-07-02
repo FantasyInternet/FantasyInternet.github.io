@@ -6,7 +6,7 @@ const
 
 const watcher = new Watcher({
   root: __dirname,
-  filter: (filename, stat) => filename === "cmd" || filename.substr(-4) === "wast"
+  filter: (filename, stat) => stat.isDirectory() || filename.substr(-4) === "wast"
 })
 
 const wastModules = []
@@ -16,7 +16,7 @@ watcher.on("any", (event, change) => {
     let i = wastModules.indexOf(change.oldPath)
     if (i >= 0) wastModules.splice(i, 1)
   }
-  if (change.newPath) {
+  if (change.newPath && !change.newStats.isDirectory()) {
     let wast = fs.readFileSync(change.newPath)
     if (wast.indexOf("(module") >= 0) wastModules.push(change.newPath)
   }
