@@ -26,7 +26,7 @@ watcher.on("any", (event, change) => {
     console.log("Compiling ", file, "...")
     let bundle = waquire("./" + file)
     // fs.writeFileSync(file.replace(".wast", ".bundle"), bundle)
-    fs.writeFileSync(file.replace(".wast", ".wasm"), new Uint8Array(wabt.parseWat(file, bundle).toBinary({}).buffer))
+    fs.writeFileSync(file.replace(".wast", ".wasm"), new Uint8Array(wabt.parseWat(file, bundle).toBinary({ write_debug_names: true }).buffer))
   })
   console.log("oK")
   setTimeout(() => {

@@ -19,6 +19,7 @@ The following functions can be imported from the `"env"` field. In a `.wa(s)t`-f
 ### The buffer stack
     pushFromMemory(offset, length)
     popToMemory(offset)
+    teeToMemory(offset)
     getBufferSize([indexFromEnd]): length
 
 WebAssembly (wasm) only supports numerical datatypes as function parameters and return types. To pass strings and binary data back and forth, you can use the buffer stack to copy any length of data in and out of linear memory.
@@ -156,3 +157,4 @@ In order for your program to run, it needs to export any of the following functi
     display(timestamp) // on screen refresh
     break() // when user presses ESC or Back
 
+In addition to the above functions, any export, the name of which starts with `"env."`, will be available for processes loaded with `loadProcess()` to import from the `"env"` field under the same name, sans the `"env."` prefix. 
