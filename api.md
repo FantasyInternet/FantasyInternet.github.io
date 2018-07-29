@@ -16,6 +16,8 @@ The following functions can be imported from the `"env"` field. In a `.wa(s)t`-f
       (func $getApiFunctionIndex (result i32))
     )
 
+Take a look at some ["Hello world" examples](https://github.com/FantasyInternet/examples) to see how to import these in other programming languages.
+
 ### The buffer stack
     pushFromMemory(offset, length)
     popToMemory(offset)
