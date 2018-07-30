@@ -1,12 +1,11 @@
 const
   Watcher = require("file-watcher"),
-  wabt = require("wabt"),
-  waquire = require("waquire"),
+  walt = require("walt-compiler").default,
   fs = require("fs")
 
 const watcher = new Watcher({
   root: __dirname,
-  filter: (filename, stat) => stat.isDirectory() || filename.substr(-4) === "wast"
+  filter: (filename, stat) => stat.isDirectory() || filename.substr(-5) === ".walt"
 })
 
 const wastModules = []
@@ -18,15 +17,15 @@ watcher.on("any", (event, change) => {
   }
   if (change.newPath && !change.newStats.isDirectory()) {
     let wast = fs.readFileSync(change.newPath)
-    if (wast.indexOf("(module") >= 0) wastModules.push(change.newPath)
+    wastModules.push(change.newPath)
   }
   if (cooldown) return
   cooldown = true
   wastModules.forEach((file) => {
     console.log("Compiling ", file, "...")
-    let bundle = waquire("./" + file)
-    // fs.writeFileSync(file.replace(".wast", ".bundle"), bundle)
-    fs.writeFileSync(file.replace(".wast", ".wasm"), new Uint8Array(wabt.parseWat(file, bundle).toBinary({ write_debug_names: true }).buffer))
+    let srcCode = "" + fs.readFileSync(file)
+    let binary = walt(srcCode)
+    fs.writeFileSync(file.replace(".walt", ".wasm"), new Uint8Array(binary))
   })
   console.log("oK")
   setTimeout(() => {

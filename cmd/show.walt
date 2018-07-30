@@ -1,0 +1,45 @@
+// import functions from the fantasy internet API, documented at https://fantasyinternet.github.io/api
+import { pushFromMemory: Fii_ } from "env";
+import { popToMemory: Fi_ } from "env";
+import {"break" : F_ as exit} from "env";
+import { readImage: Fc_i } from "env";
+import { print: F_ } from "env";
+import { getArg: Fi_i } from "env";
+import { getString: Fii_ } from "env";
+import { getStringLength: Fi_i } from "env";
+import { setDisplayMode: Fiii_ } from "env";
+import { displayMemory: Fii_ } from "env";
+// Function signatures needs to be declared thusly
+type F_ = () => void;
+type Fi_ = (i32) => void;
+type Fi_i = (i32) => i32;
+type Fii_ = (i32, i32) => void;
+type Fiii_ = (i32, i32, i32) => void;
+type Fc_i = (Function) => i32;
+
+// Setup memory and table.
+export const memory: Memory = { initial: 128 };
+export const table: Table = { initial: 1, element: anyfunc };
+
+// callback will be called once file is readImage.
+function readImageCB(success: i32, width: i32, height: i32) {
+  if (success) {
+    let len: i32 = 4 * width * height;
+    popToMemory(0);
+    setDisplayMode(1, width, height);
+    displayMemory(0, len);
+  } else {
+    pushFromMemory(-1, -1);
+  }
+}
+
+// This function will be exported and called at startup
+export function init(): void {
+  let cd: i32 = "./";
+  let strId: i32 = getArg(1);
+  let strLen: i32 = getStringLength(strId);
+  getString(strId, cd + 3);
+  pushFromMemory(cd + 1, strLen + 2);
+  strId = readImage(readImageCB);
+};
+

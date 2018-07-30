@@ -1,0 +1,28 @@
+// import functions from the fantasy internet API, documented at https://fantasyinternet.github.io/api
+import { pushFromMemory: Fii_ } from "env";
+import { "break" : F_ as exit } from "env";
+import { setBaseUrl: F_ } from "env";
+import { getArg : Fi_i } from "env";
+import { getString : Fii_ } from "env";
+import { getStringLength : Fi_i } from "env";
+// Function signatures needs to be declared thusly
+type F_ = () => void;
+type Fi_ = (i32) => void;
+type Fi_i = (i32) => i32;
+type Fii_ = (i32, i32) => void;
+type Fiii_ = (i32, i32, i32) => void;
+
+// Setup memory.
+export const memory: Memory = { initial: 1 };
+
+// This function will be exported and called at startup
+export function init(): void {
+  let strId: i32 = getArg(1);
+  let strLen: i32 = getStringLength(strId);
+  i32.store8(strLen, 0x2f);
+  strLen += 1;
+  getString(strId, 0);
+  pushFromMemory(0, strLen);
+  setBaseUrl();
+  exit();
+};
