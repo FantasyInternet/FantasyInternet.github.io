@@ -1,21 +1,32 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){module.exports={"name":"cyberterminal","version":"0.6.0","description":"A fantasy internet client.","author":{"name":"poeticandroid","url":"http://poeticandroid.online/","email":"i@poeticandroid.online"},"private":true,"build":{"appId":"poeticandroid.cyberterminal","productName":"CyberTerminal","nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true},"win":{"target":[{"target":"nsis","arch":["x64","ia32"]}],"icon":"icons/512x512.png"},"mac":{"category":"public.app-category.utilities"},"linux":{"target":[{"target":"deb","arch":["x64","ia32"]}],"icon":"icons/","category":"Network"},"directories":{"buildResources":"./build/electron-version/","app":"./build/electron-version/","output":"./build-desktop/"}},"scripts":{"prepare":"jake","build":"jake","build-desktop":"electron-builder","deploy":"jake deploy","start":"statify -d ./build/","watch":"jake watch"},"devDependencies":{"@types/electron":"^1.6.10","browserify":"^16.2.2","cssmin":"^0.4.3","electron-builder":"^20.18.0","fantasyinternet.wast":"0.0.4","file-watch":"^0.1.0","ftp":"^0.3.10","htmlmin":"0.0.7","jake":"^8.0.16","jsmin":"^1.0.1","jstransformer-markdown-it":"^2.1.0","less":"^3.0.4","livereload":"^0.7.0","md5":"^2.2.1","pug":"^2.0.3","tsify":"^4.0.0","typedoc":"^0.11.1","typedoc-plugin-markdown":"^1.1.13","typescript":"^2.9.2","wabt":"^1.0.0","walt-compiler":"^0.6.2","waquire":"^0.3.1"},"dependencies":{"statify":"^2.0.1"}}},{}],2:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class Breaker{constructor(sys){this.sys=sys;this.state={level:0};this._listeners=[];document.addEventListener("keydown",(e)=>{if(e.code==="Escape"&&this.state.level===0){this.state.level=1;setTimeout(()=>{if(this.state.level===1){this.state.level=2;this._sendState();}},1024);}});document.addEventListener("keyup",(e)=>{if(e.code==="Escape"){this._sendState();this.state.level=0;this._sendState();}});}
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){module.exports={"name":"cyberterminal","version":"0.7.0","description":"A fantasy internet client.","author":{"name":"poeticandroid","url":"http://poeticandroid.online/","email":"i@poeticandroid.online"},"private":true,"build":{"appId":"poeticandroid.cyberterminal","productName":"CyberTerminal","nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true},"win":{"target":[{"target":"nsis","arch":["x64","ia32"]}],"icon":"icons/512x512.png"},"mac":{"category":"public.app-category.utilities"},"linux":{"target":[{"target":"deb","arch":["x64","ia32"]}],"icon":"icons/","category":"Network"},"directories":{"buildResources":"./build/electron-version/","app":"./build/electron-version/","output":"./build-desktop/"}},"scripts":{"prepare":"jake","build":"jake","build-desktop":"electron-builder","deploy":"jake deploy","start":"statify -d ./build/","watch":"jake watch"},"devDependencies":{"@types/electron":"^1.6.10","browserify":"^16.2.3","cssmin":"^0.4.3","electron-builder":"^20.28.4","fantasyinternet.poem":"^0.20.0","file-watch":"^0.1.0","ftp":"^0.3.10","htmlmin":"0.0.7","jake":"^8.0.18","jsmin":"^1.0.1","jstransformer-markdown-it":"^2.1.0","less":"^3.8.1","livereload":"^0.7.0","md5":"^2.2.1","poetry-compiler":"^0.32.0","pug":"^2.0.3","tsify":"^4.0.0","typedoc":"^0.12.0","typedoc-plugin-markdown":"^1.1.16","typescript":"^3.1.1"},"dependencies":{"statify":"^2.0.1"}}},{}],2:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class Breaker{constructor(sys){this.sys=sys;this.state={level:0};this._listeners=[];document.addEventListener("keydown",(e)=>{if(e.code==="Escape"&&this.state.level===0){this.state.level=1;setTimeout(()=>{if(this.state.level===1){this.state.level=2;this._sendState();}},1024);}});document.addEventListener("keyup",(e)=>{if(e.code==="Escape"){this._sendState();this.state.level=0;this._sendState();}});}
 addEventListener(fn){let i=this._listeners.indexOf(fn);if(i<0){this._listeners.push(fn);}}
 removeEventListener(fn){let i=this._listeners.indexOf(fn);if(i>=0){this._listeners.splice(i,1);}}
 _sendState(){let newState=JSON.stringify(this.state);if(this._lastState!==newState){this._lastState=newState;this._listeners.forEach((fn)=>{fn(this.state);});}}}
-exports.default=Breaker;},{}],3:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class ChipSound{constructor(){this._channels=[];this._ctx=new AudioContext();if(this._ctx.state==="suspended"){let cb=()=>{this._ctx.resume();if(this._ctx.state==="running"){document.body.removeEventListener("pointerdown",cb);document.body.removeEventListener("keydown",cb);}};document.body.addEventListener("pointerdown",cb);document.body.addEventListener("keydown",cb);}}
-startTone(channel,frequency,volume=1,type="square"){let chan=this._channels[channel];if(!chan){chan={oscillator:this._ctx.createOscillator(),gain:this._ctx.createGain(),autoStop:null};chan.oscillator.connect(chan.gain);chan.gain.connect(this._ctx.destination);}
-clearTimeout(chan.autoStop);chan.oscillator.frequency.setValueAtTime(frequency,0);chan.gain.gain.setValueAtTime(volume*.5,0);chan.oscillator.type=type;if(!this._channels[channel]){this._channels[channel]=chan;chan.oscillator.start();}
-chan.autoStop=setTimeout(()=>{this.stopTone(channel);},1000*10);}
-stopTone(channel){let chan=this._channels[channel];if(chan){clearTimeout(chan.autoStop);chan.oscillator.stop();chan.oscillator.disconnect(chan.gain);chan.gain.disconnect(this._ctx.destination);delete this._channels[channel];}}
+exports.default=Breaker;},{}],3:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class ChipSound{constructor(){this._channels=[];this._ctx=new AudioContext();if(this._ctx.state==="suspended"){let cb=()=>{this._ctx.resume();if(this._ctx.state==="running"){document.body.removeEventListener("pointerdown",cb);document.body.removeEventListener("keydown",cb);}};document.body.addEventListener("pointerdown",cb);document.body.addEventListener("keydown",cb);}
+this._whiteNoise=this._ctx.createBuffer(1,this._ctx.sampleRate*2,this._ctx.sampleRate);let noise=this._whiteNoise.getChannelData(0);for(let i=0;i<noise.length;i++){noise[i]=Math.random()*2-1;}}
+startTone(channel,frequency,volume=1,type="square"){let chan=this._channels[channel];if(chan&&chan.type!==type){this.stopTone(channel);chan=this._channels[channel];}
+if(!chan){chan={type:type,gain:this._ctx.createGain(),autoStop:null,oscillator:null,bufferSource:null};chan.gain.gain.setValueAtTime(0,0);chan.gain.connect(this._ctx.destination);if(type==="noise"){chan.bufferSource=this._ctx.createBufferSource();chan.bufferSource.buffer=this._whiteNoise;chan.bufferSource.loop=true;chan.bufferSource.connect(chan.gain);chan.bufferSource.start();}
+else{chan.oscillator=this._ctx.createOscillator();chan.oscillator.type=type;chan.oscillator.connect(chan.gain);chan.oscillator.start();}
+this._channels[channel]=chan;}
+this.rampFrequency(channel,frequency,.001);this.rampVolume(channel,volume,.001);}
+rampFrequency(channel,frequency,duration){let chan=this._channels[channel];if(!chan)
+return;if(chan.bufferSource){chan.bufferSource.playbackRate.cancelScheduledValues(this._ctx.currentTime+duration);chan.bufferSource.playbackRate.linearRampToValueAtTime(frequency/1760,this._ctx.currentTime+duration);}
+if(chan.oscillator){chan.oscillator.frequency.cancelScheduledValues(this._ctx.currentTime+duration);chan.oscillator.frequency.linearRampToValueAtTime(frequency,this._ctx.currentTime+duration);}
+clearTimeout(chan.autoStop);chan.autoStop=setTimeout(()=>{this.stopTone(channel);},1000*10);}
+rampVolume(channel,volume,duration){let chan=this._channels[channel];if(!chan)
+return;chan.gain.gain.cancelScheduledValues(this._ctx.currentTime+duration);chan.gain.gain.linearRampToValueAtTime(volume*.5,this._ctx.currentTime+duration);clearTimeout(chan.autoStop);chan.autoStop=setTimeout(()=>{this.stopTone(channel);},1000*10);}
+stopTone(channel){let chan=this._channels[channel];if(chan){clearTimeout(chan.autoStop);if(chan.oscillator){chan.oscillator.stop();chan.oscillator.disconnect(chan.gain);}
+if(chan.bufferSource){chan.bufferSource.stop();chan.bufferSource.disconnect(chan.gain);}
+chan.gain.disconnect(this._ctx.destination);delete this._channels[channel];}}
 stopAll(){for(let i=0;i<this._channels.length;i++){this.stopTone(i);}}}
 exports.default=ChipSound;},{}],4:[function(require,module,exports){"use strict";var __awaiter=(this&&this.__awaiter)||function(thisArg,_arguments,P,generator){return new(P||(P=Promise))(function(resolve,reject){function fulfilled(value){try{step(generator.next(value));}catch(e){reject(e);}}
 function rejected(value){try{step(generator["throw"](value));}catch(e){reject(e);}}
 function step(result){result.done?resolve(result.value):new P(function(resolve){resolve(result.value);}).then(fulfilled,rejected);}
-step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});let pkg=require("../../../package.json");class CyberTerminal{constructor(sys){this.sys=sys;this.machineWorkers=[];this._resizeState={};this.sys.textInput.addEventListener(this._onTextInput.bind(this));this.sys.mouseInput.addEventListener(this._onMouseInput.bind(this));this.sys.gameInput.addEventListener(this._onGameInput.bind(this));this.sys.breaker.addEventListener(this._onBreak.bind(this));this.sys.addEventListener("resize",this._onResize.bind(this));this.sys.setDisplayMode("text",80,20);this.sys.print("CyberTerminal v"+pkg.version);setTimeout(()=>{this.sys.startTone(0,512);setTimeout(()=>{this.connectTo(this.sys.startupUrl);},256);},1024);document.addEventListener("visibilitychange",()=>{if(this.machineWorkers.length){if(document.visibilityState==="visible"){this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
+step((generator=generator.apply(thisArg,_arguments||[])).next());});};Object.defineProperty(exports,"__esModule",{value:true});let pkg=require("../../../package.json");class CyberTerminal{constructor(sys){this.sys=sys;this.machineWorkers=[];this._resizeState={};this.sys.textInput.addEventListener(this._onTextInput.bind(this));this.sys.mouseInput.addEventListener(this._onMouseInput.bind(this));this.sys.gameInput.addEventListener(this._onGameInput.bind(this));this.sys.breaker.addEventListener(this._onBreak.bind(this));this.sys.addEventListener("resize",this._onResize.bind(this));this.sys.setDisplayMode("text",80,20);this.sys.print("CyberTerminal v"+pkg.version);setTimeout(()=>{this.sys.startTone(0,384);this.sys.rampFrequency(0,384,.063);this.sys.rampFrequency(0,512,.064);this.sys.rampVolume(0,0,0.3333);setTimeout(()=>{this.connectTo(this.sys.startupUrl);},256);},1024);document.addEventListener("visibilitychange",()=>{if(this.machineWorkers.length){if(document.visibilityState==="visible"){this.machineWorkers[this.machineWorkers.length-1].send({cmd:"resume"});}
 else{this.machineWorkers[this.machineWorkers.length-1].send({cmd:"suspend"});this.sys.chipSound.stopAll();}}});}
 connectTo(url){return __awaiter(this,void 0,void 0,function*(){if(this._connecting){if(this._lastActiveMachine===this._lastConnectingMachine){clearTimeout(this._connecting);this._connecting=setTimeout(()=>{this._connecting=null;},2048);}
 return;}
-console.group(url);console.log("Connecting to",url);this.sys.setDisplayMode("text",80,20);this.sys.print("\n\nConnecting to "+url);this._connecting=setTimeout(null);let machine=this.addMachine();let msg=yield this._findBoot(url);if(msg.wasm){this.sys.print(".");this.setAddress(""+msg.url);this.sys.setDisplayMode("none",0,0);machine.send({cmd:"resize",state:this._resizeState});machine.send(msg);this._connecting=null;}
+console.group(url);console.log("Connecting to",url);this.sys.setDisplayMode("text",80,20);this.sys.print("\n\nConnecting to "+url);this._connecting=setTimeout(()=>{});let machine=this.addMachine();let msg=yield this._findBoot(url);if(msg.wasm){this.sys.print(".");this.setAddress(""+msg.url);this.sys.setDisplayMode("none",0,0);machine.send({cmd:"resize",state:this._resizeState});machine.send(msg);this._connecting=null;}
 else{this.sys.print("!\n");this.sys.print("could not load boot.wasm!");this.setAddress(""+msg.url);this.sys.openWeb(url);this._connecting=setTimeout(()=>{if(this.machineWorkers.length>1){this.removeMachine();}
 this._connecting=null;},2048);}
 this._lastConnectingMachine=this._lastActiveMachine;});}
@@ -114,24 +125,24 @@ x--;if(this.state.buttons.y)
 y++;if(this.state.buttons.b)
 y--;let mag=Math.sqrt(Math.pow(x,2)+Math.pow(y,2));if(mag>1){x/=mag;y/=mag;}
 rightKnob.style.left=x+"em";rightKnob.style.top=y+"em";}}
-exports.default=GameInput;},{}],6:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});let wabt=require("./wabt");class Machine{constructor(){this._active=false;this._nextStep=performance.now();this._stepInterval=-1;this._stepCount=0;this._stepSecond=0;this._frameCount=0;this._frameSecond=0;this._toneTypes=["square","sawtooth","triangle","sine"];this._displayModes=["text","pixel"];this._displayMode=-1;this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._transferBuffer=new ArrayBuffer(8);this._lastCommit=performance.now();this._pendingCommits=[];this._pendingRequests=[];this._baseUrl="";this._originUrl="";this._romApiNames=[];this._processes=[];this._activePID=-1;this._bufferStack=new Uint8Array(1024);this._bufferStackLengths=[];this._asyncCalls=0;this._inputFocus=-1;this._textInputState={type:0,text:"",pos:0,len:0,key:0};this._keyBuffer=[0];this._inputTypes=["multiline","text","password","number","url","email","tel"];this._mouseInputState={x:0,y:0,pressed:false};this._mouseTypes=["none","default"];this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._nativeDisplay={width:0,height:0};this._initCom();}
+exports.default=GameInput;},{}],6:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});let wabt=require("./wabt");class Machine{constructor(){this._active=false;this._nextStep=performance.now();this._stepInterval=-1;this._stepCount=0;this._stepSecond=0;this._frameCount=0;this._frameSecond=0;this._toneTypes=["square","sawtooth","triangle","sine","noise"];this._displayModes=["text","pixel"];this._displayMode=-1;this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._transferBuffer=new ArrayBuffer(8);this._lastCommit=performance.now();this._pendingCommits=[];this._pendingRequests=[];this._baseUrl="";this._originUrl="";this._romApiNames=[];this._processes=[];this._bufferStack=new Uint8Array(1024);this._bufferStackLengths=[];this._asyncCalls=0;this._inputFocus=-1;this._textInputState={type:0,text:"",pos:0,len:0,key:0};this._keyBuffer=[0];this._inputTypes=["multiline","text","password","number","url","email","tel"];this._mouseInputState={x:0,y:0,pressed:false};this._mouseTypes=["none","default"];this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._nativeDisplay={width:0,height:0};this._initCom();}
 log(){console.log("📟",this._popString());}
 logNumber(){console.log("💡",...arguments);}
 setDisplayMode(mode,width,height,visibleWidth=width,visibleHeight=height){this._sysCall("setDisplayMode",this._displayModes[mode],width,height,visibleWidth,visibleHeight);this._displayMode=mode;this._displayWidth=width;this._displayHeight=height;this._visibleWidth=visibleWidth;this._visibleHeight=visibleHeight;switch(this._displayModes[this._displayMode]){case"text":break;case"pixel":break;default:this._displayMode=-1;this._visibleWidth=-1;this._visibleHeight=-1;throw"DisplayMode not supported!";}
 return;}
 print(){this._sysCall("print",this._popString());}
-displayMemory(offset,length,destination=0){let process=this._processes[this._activePID];if(!process)
+displayMemory(offset,length,destination=0,pid=0){let process=this._processes[pid];if(!process)
 throw"No active process!";let buffer;if(this._transferBuffer&&this._transferBuffer.byteLength===(this._displayWidth*this._displayHeight*4)){buffer=this._transferBuffer;delete this._transferBuffer;}
 else{console.warn("Creating new _transferBuffer");buffer=new ArrayBuffer(this._displayWidth*this._displayHeight*4);}
 let data=new Uint8ClampedArray(buffer);data.set(new Uint8Array(process.instance.exports.memory.buffer.slice(offset,offset+length)),destination);postMessage({cmd:"imagedata",width:this._displayWidth,height:this._displayHeight,buffer:buffer},[buffer]);this._lastCommit=performance.now();}
 getNativeDisplayWidth(){return this._nativeDisplay.width;}
 getNativeDisplayHeight(){return this._nativeDisplay.height;}
-pushFromMemory(offset,length){let process=this._processes[this._activePID];if(!process)
+pushFromMemory(offset,length,pid=0){let process=this._processes[pid];if(!process)
 throw"No active process!";let ar=new Uint8Array(length);ar.set(new Uint8Array(process.instance.exports.memory.buffer.slice(offset,offset+length)));return this._pushArrayBuffer(ar.buffer);}
-popToMemory(offset){let process=this._processes[this._activePID];if(!process)
+popToMemory(offset,pid=0){let process=this._processes[pid];if(!process)
 throw"No active process!";if(!this._bufferStackLengths.length)
 throw"Buffer stack is empty!";let ar=new Uint8Array(process.instance.exports.memory.buffer);ar.set(new Uint8Array(this._popArrayBuffer()),offset);}
-teeToMemory(offset){let len=this.getBufferSize();this.popToMemory(offset);this._bufferStackLengths.push(len);}
+teeToMemory(offset,pid=0){let len=this.getBufferSize();this.popToMemory(offset,pid);this._bufferStackLengths.push(len);}
 getBufferSize(indexFromEnd=0){indexFromEnd++;return this._bufferStackLengths[this._bufferStackLengths.length-indexFromEnd]||0;}
 getApiFunctionIndex(){let name=this._popString();return Math.max(0,this._romApiNames.indexOf(name));}
 callApiFunction(index,...params){return this[this._romApiNames[index]].apply(this,params);}
@@ -143,39 +154,37 @@ setBaseUrl(){let relurl=this._popString();if(this._originUrl){let url=new URL(re
 throw"cross origin not allowed!";this._baseUrl=url.toString();}
 else{let url=new URL(relurl);this._baseUrl=url.toString();this._originUrl=this._baseUrl.substr(0,this._baseUrl.indexOf(url.pathname)+1);}
 this._sysCall("setAddress",this._baseUrl,false);}
-read(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+read(callback,pid=0){callback=this._getCallback(callback,pid);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("read",filename,{type:"binary"}).then((data)=>{this._pushArrayBuffer(data);callback(true,data.byteLength,id);}).catch((err)=>{console.error(err);callback(false,0,id);});return id;}
-readImage(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+readImage(callback,pid=0){callback=this._getCallback(callback,pid);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("read",filename,{type:"image"}).then((data)=>{this._pushArrayBuffer(data.data.buffer);callback(true,data.width,data.height,id);}).catch((err)=>{console.error(err);callback(false,0,0,id);});return id;}
-write(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let data=this._popArrayBuffer();let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+write(callback,pid=0){callback=this._getCallback(callback,pid);let id=this._asyncCalls++;let data=this._popArrayBuffer();let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("write",filename,data).then((success)=>{callback(success,id);}).catch((err)=>{console.error(err);callback(false,id);});return id;}
-delete(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+delete(callback,pid=0){callback=this._getCallback(callback,pid);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("delete",filename).then((success)=>{callback(success,id);}).catch((err)=>{console.error(err);callback(false,id);});return id;}
-list(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+list(callback,pid=0){callback=this._getCallback(callback,pid);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("list",filename).then((list)=>{callback(true,this._pushString(list),id);}).catch((err)=>{console.error(err);callback(false,0,id);});return id;}
-head(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+head(callback,pid=0){callback=this._getCallback(callback,pid);let id=this._asyncCalls++;let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("head",filename).then((headers)=>{callback(true,this._pushString(headers),id);}).catch((err)=>{console.error(err);callback(false,0,id);});return id;}
-post(callback){callback=this._getCallback(callback);let id=this._asyncCalls++;let data=this._popString();let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
+post(callback,pid=0){callback=this._getCallback(callback,pid);let id=this._asyncCalls++;let data=this._popString();let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("post",filename,data).then((data)=>{callback(true,this._pushString(data),id);}).catch((err)=>{console.error(err);callback(false,0,id);});return id;}
-setStepInterval(milliseconds){this._stepInterval=milliseconds;}
-loadProcess(){let wasm=this._popArrayBuffer();let env=this._processes.length?this._generateProcessApi():this._generateRomApi();let pid=this._processes.length;this._processes.push(null);console.log("loading process",pid);WebAssembly.instantiate(wasm,{env,Math}).then((process)=>{this._activePID=pid;this._processes[pid]=process;if(process.instance.exports.init){try{process.instance.exports.init();this._active=true;}
+setStepInterval(milliseconds){this._stepInterval=milliseconds;setTimeout(this._tick.bind(this));}
+loadProcess(){let wasm=this._popArrayBuffer();let env=this._processes.length?this._generateProcessApi():this._generateRomApi();let pid=this._processes.length;this._processes.push(null);console.log("loading process",pid);WebAssembly.instantiate(wasm,{env,Math}).then((process)=>{this._processes[pid]=process;if(process.instance.exports.init){try{process.instance.exports.init();this._active=true;}
 catch(error){console.trace(error);this.killProcess(pid);this._die(error);}}
-this._nextStep=performance.now();if(this._activePID===0)
-this._tick();this._activePID=0;}).catch((err)=>{console.trace(err);this._processes[pid]=false;if(!pid){this._die(err);}
-if(this._activePID===0)
+this._nextStep=performance.now();if(pid===0)
+this._tick();}).catch((err)=>{console.trace(err);this._processes[pid]=false;if(!pid){this._die(err);}
+if(pid===0)
 this._tick();});return pid;}
 processStatus(pid){if(this._processes[pid]===false)
 return-1;if(this._processes[pid]===undefined)
 return 0;if(this._processes[pid]===null)
 return 1;if(this._processes[pid])
 return 2;}
-stepProcess(pid){let oldpid=this._activePID;this._activePID=pid;let process=this._processes[this._activePID];if(process&&process.instance.exports.step){try{process.instance.exports.step(performance.now());}
-catch(error){console.trace(error);this.killProcess(pid);}}
-this._activePID=oldpid;}
-callbackProcess(pid,tableIndex,...a){let oldpid=this._activePID;this._activePID=pid;let process=this._processes[this._activePID];if(process){try{process.instance.exports.table.get(tableIndex)(...a);}
-catch(error){console.trace(error);this.killProcess(pid);}}
-this._activePID=oldpid;}
-killProcess(pid){this._processes[pid]&&console.log("killing process",pid);this._processes[pid]=false;this._activePID=0;}
+stepProcess(pid){let process=this._processes[pid];if(process&&process.instance.exports.step){try{process.instance.exports.step(performance.now());}
+catch(error){console.trace(error);this.killProcess(pid);}}}
+callbackProcess(pid,tableIndex,...a){let process=this._processes[pid];if(process){try{process.instance.exports.table.get(tableIndex)(...a);}
+catch(error){console.trace(error);this.killProcess(pid);}}}
+killProcess(pid){this._processes[pid]&&console.log("killing process",pid);this._processes[pid]=false;}
 transferMemory(srcPid,srcOffset,length,destPid,destOffset){let srcProcess=this._processes[srcPid];let destProcess=this._processes[destPid];if(!srcProcess)
 throw"No active process!";let ar=new Uint8Array(destProcess.instance.exports.memory.buffer);ar.set(new Uint8Array(srcProcess.instance.exports.memory.buffer.slice(srcOffset,srcOffset+length)),destOffset);}
 focusInput(input){this._inputFocus=input;switch(input){case 1:this._sysCall("focusInput","text");break;case 2:this._sysCall("focusInput","mouse");break;case 3:this._sysCall("focusInput","game");break;}}
@@ -198,6 +207,8 @@ getGameButtonB(){return this._gameInputState.buttons.b;}
 getGameButtonX(){return this._gameInputState.buttons.x;}
 getGameButtonY(){return this._gameInputState.buttons.y;}
 startTone(channel,frequency,volume=1,type=0){this._sysCall("startTone",channel,frequency,volume,this._toneTypes[type]);}
+rampFrequency(channel,frequency,duration){this._sysCall("rampFrequency",channel,frequency,duration);}
+rampVolume(channel,volume,duration){this._sysCall("rampVolume",channel,volume,duration);}
 stopTone(channel){this._sysCall("stopTone",channel);}
 wabt(){let wast=this._popString();let module=wabt.parseWat("idunno.wast",wast);return this._pushArrayBuffer(module.toBinary({}).buffer);}
 _tick(){if(!this._active)
@@ -250,14 +261,11 @@ _popArrayBuffer(){let len=this._bufferStackLengths.pop()||0;let offset=this._buf
 _pushString(str){let enc=new TextEncoder();let buf=enc.encode(str).buffer;return this._pushArrayBuffer(buf);}
 _popString(){let dec=new TextDecoder("utf-8");return dec.decode(this._popArrayBuffer());}
 _die(err){console.trace(err);this._processes[0]=false;this.setDisplayMode(0,80,20);this._pushString("\n\nError!\n"+err);this.print();}
-_getCallback(callback){if(typeof callback==="number"){let pid=this._activePID;let process=this._processes[pid];if(!process)
-throw"No active process!";let num=callback;callback=(...args)=>{let oldpid=this._activePID;let out;try{this._activePID=pid;process=this._processes[pid];out=process.instance.exports.table.get(num).apply(this,args);}
-catch(error){console.trace(error);this.killProcess(pid);}
-this._activePID=oldpid;return out;};}
-return callback;}
-_getMemoryTable(pid=0){let buf=this._processes[pid].instance.exports.memory.buffer;let mem=new Uint32Array(buf.slice(0,16));mem=new Uint32Array(buf.slice(mem[2],mem[2]+mem[3]));let index=[];for(let i=0;i<mem.length;i+=4){index.push({id:mem[i+0],parent:mem[i+1],offset:mem[i+2],len:mem[i+3]});}
-return index;}
-_getMemoryPart(id,pid=0){let buf=this._processes[pid].instance.exports.memory.buffer;let index=this._getMemoryTable(pid);for(let partInfo of index){if(partInfo.id===id){return buf.slice(partInfo.offset,partInfo.offset+partInfo.len);}}}}
+_getCallback(callback,pid=0){if(typeof callback==="number"){let process=this._processes[pid];if(!process)
+throw"No active process!";let num=callback;callback=(...args)=>{let out;try{process=this._processes[pid];out=process.instance.exports.table.get(num).apply(this,args);}
+catch(error){console.trace(error);this._active=false;}
+return out;};}
+return callback;}}
 exports.default=Machine;},{"./wabt":11}],7:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class MouseInput{constructor(sys){this.sys=sys;this.state={x:0,y:0,pressed:false};this.scaleX=1;this.scaleY=1;this._listeners=[];this._element=document.body;this._mouseDown=this._mouseDown.bind(this);this._mouseMove=this._mouseMove.bind(this);this._mouseUp=this._mouseUp.bind(this);document.addEventListener("pointerup",this._mouseUp);document.addEventListener("pointerleave",this._mouseUp);}
 set element(val){this._element.removeEventListener("pointerdown",this._mouseDown);this._element.removeEventListener("pointermove",this._mouseMove);this._element=val;this._element.addEventListener("pointerdown",this._mouseDown);this._element.addEventListener("pointermove",this._mouseMove);}
 focus(){}
@@ -279,8 +287,9 @@ removeEventListener(fn){let i=this._listeners.indexOf(fn);if(i>=0){this._listene
 _sendState(){let newState=JSON.stringify(this.state);if(this._lastState!==newState){this._lastState=newState;this._listeners.forEach((fn)=>{fn(this.state);});}}
 _keyDown(e){if(e&&e.altKey&&e.code==="KeyG")
 this.sys.focusInput("game");if(e&&e.code==="Escape")
-return;requestAnimationFrame(()=>{let input=this._input;this.state.text=input.value;this.state.pos=input.selectionStart==null?input.value.length:input.selectionStart;this.state.len=(input.selectionEnd||this.state.pos)-this.state.pos;this.state.key=0;if(e&&e.type==="keydown")
-this.state.key=e.keyCode;this._sendState();});}}
+return;requestAnimationFrame(()=>{let input=this._input;this.state.text=input.value;this.state.pos=input.selectionStart==null?input.value.length:input.selectionStart;this.state.len=(input.selectionEnd||this.state.pos)-this.state.pos;this.state.key=0;let start=this.state.text.substr(0,this.state.pos);let sel=this.state.text.substr(this.state.pos,this.state.len);this.state.pos=this._countCharacters(start);this.state.len=this._countCharacters(sel);if(e&&e.type==="keydown")
+this.state.key=e.keyCode;this._sendState();});}
+_countCharacters(str){return Array.from(str).length;}}
 exports.default=TextInput;},{}],9:[function(require,module,exports){"use strict";var __awaiter=(this&&this.__awaiter)||function(thisArg,_arguments,P,generator){return new(P||(P=Promise))(function(resolve,reject){function fulfilled(value){try{step(generator.next(value));}catch(e){reject(e);}}
 function rejected(value){try{step(generator["throw"](value));}catch(e){reject(e);}}
 function step(result){result.done?resolve(result.value):new P(function(resolve){resolve(result.value);}).then(fulfilled,rejected);}
@@ -293,7 +302,8 @@ switch(this._displayMode){case"none":break;case"text":this._initTextGrid(width,h
 return;}
 drawBitmap(buffer){if(this._displayContext&&this._displayBitmap){let data=new Uint8ClampedArray(buffer);this._displayBitmap.data.set(data,0);this._displayContext.putImageData(this._displayBitmap,0,0);}}
 print(str){if(!this._displayTextGrid)
-return;for(let char of str){if(this._displayTextEscape){this._displayTextEscape+=char;if(char==="\x1b")
+return;let wideChars=false;for(let char of str){let codePoint=char.codePointAt(0);if(codePoint&&codePoint>1024)
+wideChars=true;if(this._displayTextEscape){this._displayTextEscape+=char;if(char==="\x1b")
 this._displayTextEscape="e";if(this._displayTextEscape.length>16)
 this._displayTextEscape="";let match;if(match=this._displayTextEscape.match(/e\[([0-9]*)A/)){let count=Number.parseInt(match[1])||1;this._displayCursorRow=Math.max(this._displayCursorRow-count,0);this._displayTextEscape="";}
 else if(match=this._displayTextEscape.match(/e\[([0-9]*)B/)){let count=Number.parseInt(match[1])||1;this._displayCursorRow=Math.min(this._displayCursorRow+count,this._displayHeight-1);this._displayTextEscape="";}
@@ -322,7 +332,8 @@ while(this._displayCursorCol<0){this._displayCursorCol+=this._displayWidth;this.
 while(this._displayCursorCol>=this._displayWidth){this._displayCursorCol-=this._displayWidth;this._displayCursorRow++;}
 while(this._displayCursorRow<0){this._displayCursorRow=0;}
 while(this._displayCursorRow>=this._displayHeight){this._scrollText();}}
-let selector=`div:nth-child(${this._displayCursorRow+1})\nspan:nth-child(${this._displayCursorCol+1})`;let cell=this._displayTextGrid.querySelector(selector);cell.classList.add("current");}
+let selector=`div:nth-child(${this._displayCursorRow+1})\nspan:nth-child(${this._displayCursorCol+1})`;let cell=this._displayTextGrid.querySelector(selector);cell.classList.add("current");if(wideChars)
+this._resize();}
 waitForVsync(){return __awaiter(this,void 0,void 0,function*(){return new Promise((resolve,reject)=>{requestAnimationFrame(resolve);});});}
 createMachine(){return new WebMachineWorker();}
 read(filename,options={}){return __awaiter(this,void 0,void 0,function*(){let res=yield fetch(filename);if(res.ok){this._dirCache(filename,true);}
@@ -349,6 +360,8 @@ else{list+=name+"\n";}}
 else if(dir[name]==null){list+=name+"\n";}}}
 return list;});}
 startTone(){this.chipSound.startTone.apply(this.chipSound,arguments);}
+rampFrequency(){this.chipSound.rampFrequency.apply(this.chipSound,arguments);}
+rampVolume(){this.chipSound.rampVolume.apply(this.chipSound,arguments);}
 stopTone(){this.chipSound.stopTone.apply(this.chipSound,arguments);}
 focusInput(input){let i=this.inputPriority.indexOf(input);if(i>=0){this.inputPriority.splice(i,1);this.inputPriority.unshift(input);}
 for(let i=0;i<this.inputPriority.length;i++){if(i){this[this.inputPriority[i]+"Input"].blur();}

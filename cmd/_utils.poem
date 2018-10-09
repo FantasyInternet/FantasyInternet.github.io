@@ -1,0 +1,15 @@
+import "env" "getArgs" _get_args
+include "fantasyinternet.poem/buffer_stack.poem"
+include "fantasyinternet.poem/cli.poem"
+
+func get_args
+  var cmd = pop_string_to_memory _get_args
+  return parse_command cmd
+
+func format_path path trail
+  var out = "."
+  if path
+    out += "/"+path
+  if trail && (string_slice out (string_length out)-1 3) != "/"
+    out += "/"
+  return out

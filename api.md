@@ -19,9 +19,9 @@ The following functions can be imported from the `"env"` field. In a `.wa(s)t`-f
 Take a look at some ["Hello world" examples](https://github.com/FantasyInternet/examples) to see how to import these in other programming languages.
 
 ### The buffer stack
-    pushFromMemory(offset, length)
-    popToMemory(offset)
-    teeToMemory(offset)
+    pushFromMemory(offset, length [, pid])
+    popToMemory(offset [, pid])
+    teeToMemory(offset [, pid])
     getBufferSize([indexFromEnd]): length
 
 WebAssembly (wasm) only supports numerical datatypes as function parameters and return types. To pass strings and binary data back and forth, you can use the buffer stack to copy any length of data in and out of linear memory.
@@ -57,7 +57,7 @@ These log messages and numbers to the developer console. Useful for debugging.
     // modes: 0=text, 1=pixel
     setDisplayMode(mode, width, height [, visibleWidth, visibleHeight])
     print(string$) // only works in text mode.
-    displayMemory(offset, length [, screenOffset]) // only pixel mode.
+    displayMemory(offset, length [, screenOffset [, pid]]) // only pixel mode.
     getNativeDisplayWidth(): width
     getNativeDisplayHeight(): height
 
@@ -70,8 +70,10 @@ Pixel mode relies on part of linear memory to hold a string of RGBA bytes. 4 byt
 `visibleWidth` and `visibleHeight` can be used to simulate overscan. This is useful for border graphics that is not part of the main display and therefore may be hidden to make best use of the physical pixels.
 
 ### Audio
-    // types: 0=square, 1=sawtooth, 2=triangle, 3=sine
+    // types: 0=square, 1=sawtooth, 2=triangle, 3=sine, 4=noise
     startTone(channel, frequency [, volume [, type]])
+    rampFrequency(channel, frequency, duration)
+    rampVolume(channel, volume, duration)
     stopTone(channel)
 
 It is recommended to only use `stopTone()` when you are done playing audio for a while, as it may cause a slight pop in the speakers. For short pauses play a tone on `volume=0`.
@@ -116,16 +118,16 @@ The URL connected to will be the initial base URL, where any relative URLs are r
 Currently `http(s):` and `file:` URL schemes are supported.
 
 ### File system
-    read(path$, callback(success, length$, requestID) ): requestID
-    write(path$, data$, callback(success, requestID)): requestID
-    delete(path$, callback(success, requestID)): requestID
-    list(path$, callback(success, length$, requestID)): requestID
-    head(path$, callback(success, length$, requestID)): requestID
-    post(path$, data$, callback(success, length$, requestID)): requestID
+    read(path$, callback(success, length$, requestID) [, pid]): requestID
+    write(path$, data$, callback(success, requestID) [, pid]): requestID
+    delete(path$, callback(success, requestID) [, pid]): requestID
+    list(path$, callback(success, length$, requestID) [, pid]): requestID
+    head(path$, callback(success, length$, requestID) [, pid]): requestID
+    post(path$, data$, callback(success, length$, requestID) [, pid]): requestID
 
     // readImage may be obsoleted in the future.
     // width$ and height$ refer to the same buffer.
-    readImage(path$, callback(success, width$, height$, requestID)): requestID
+    readImage(path$, callback(success, width$, height$, requestID) [, pid]): requestID
 
 File access is done through asyncrounous calls like these. The `callback` parameter is actually an index in the function table. Each of these functions return a `requestID` which is then passed again to the callback function once the operation completes. This makes it useful for the callback function to distinguish between multiple requests as they may not complete in the same order they were issued.
 

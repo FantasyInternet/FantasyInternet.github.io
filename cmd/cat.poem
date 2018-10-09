@@ -1,0 +1,15 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/filesystem.poem"
+include "fantasyinternet.poem/navigation.poem"
+include "./_utils.poem"
+
+export "init" init
+  var args = get_args
+  read (format_path args:1) #readout
+
+func readout success data req_id
+  if success
+    println data
+  else
+    println "Error reading file!"
+  shutdown

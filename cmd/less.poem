@@ -1,0 +1,37 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/filesystem.poem"
+include "fantasyinternet.poem/navigation.poem"
+include "fantasyinternet.poem/text_input.poem"
+include "./_utils.poem"
+
+var lines
+var pos = 0
+var targetpos = 4
+
+export "init" init
+  var args = get_args
+  read (format_path args:1) #readout
+
+export "step" step
+  if ((get_input_key) == 38) && targetpos > 1
+    targetpos--
+  if ((get_input_key) == 40) && targetpos < (array_length lines)+1
+    targetpos++
+  if targetpos < pos
+    pos -= 20
+  while targetpos > pos
+    if (pos >= 0) && (pos < (array_length lines))
+      println lines[pos]
+    else
+      print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    pos++
+
+func readout success data req_id
+  if success
+    lines = string_split data "\n"
+    pos = 18
+    println "Use arrows to scroll, Esc to quit."
+    step;step;step
+  else
+    println "Error reading file!"
+    shutdown

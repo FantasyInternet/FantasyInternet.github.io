@@ -1,0 +1,16 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/read_image.poem"
+include "fantasyinternet.poem/navigation.poem"
+include "./_utils.poem"
+
+export "init" init
+  var args = get_args
+  read_image (format_path args:1) #readout
+
+func readout success img req_id
+  if success
+    set_display_mode 1 img:width img:height
+    display_memory img
+  else
+    println "Error reading file!"
+    shutdown

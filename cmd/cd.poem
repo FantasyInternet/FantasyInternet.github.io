@@ -1,0 +1,16 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/filesystem.poem"
+include "fantasyinternet.poem/navigation.poem"
+include "./_utils.poem"
+
+export "init" init
+  var args = get_args
+  list (format_path args:1 "/") #readout
+
+func readout success data req_id
+  if success
+    var args = get_args
+    set_base_url (format_path args:1 "/")
+  else
+    println "Error entering directory!"
+  shutdown

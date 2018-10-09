@@ -1,11 +1,11 @@
 const
   Watcher = require("file-watcher"),
-  walt = require("walt-compiler").default,
+  poetry = require("poetry-compiler"),
   fs = require("fs")
 
 const watcher = new Watcher({
   root: __dirname,
-  filter: (filename, stat) => stat.isDirectory() || filename.substr(-5) === ".walt"
+  filter: (filename, stat) => stat.isDirectory() || filename.substr(-5) === ".poem"
 })
 
 const wastModules = []
@@ -23,9 +23,7 @@ watcher.on("any", (event, change) => {
   cooldown = true
   wastModules.forEach((file) => {
     console.log("Compiling ", file, "...")
-    let srcCode = "" + fs.readFileSync(file)
-    let binary = walt(srcCode)
-    fs.writeFileSync(file.replace(".walt", ".wasm"), new Uint8Array(binary))
+    let binary = poetry("./" + file, { wasm: file.replace(".poem", ".wasm") })
   })
   console.log("oK")
   setTimeout(() => {

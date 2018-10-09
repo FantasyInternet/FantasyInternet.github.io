@@ -1,0 +1,11 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/navigation.poem"
+
+export "init" init
+  println "Commands available:\n"
+  println "cd <dir>         Change directory."
+  println "ls               List directory contents."
+  println "cat <filename>   Print file contents."
+  println "less <filename>  Print file line by line."
+  println "show <filename>  Show image file."
+  shutdown
