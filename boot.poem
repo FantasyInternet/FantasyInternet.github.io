@@ -2,6 +2,7 @@ include "fantasyinternet.poem/log.poem"
 include "fantasyinternet.poem/display.poem"
 include "fantasyinternet.poem/navigation.poem"
 include "fantasyinternet.poem/cli.poem"
+include "fantasyinternet.poem/input.poem"
 include "fantasyinternet.poem/filesystem.poem"
 include "fantasyinternet.poem/process.poem"
 include "fantasyinternet.poem/buffer_stack.poem"
@@ -10,13 +11,17 @@ include "./_api_proxy.wast"
 var state = 0
 var orig
 var pwd
-var cmd_path
+var cmd_path = array
+var cmd_candidates = 0
+var cmd_best_req
+var cmd_best_wasm
 var command
 
 export "init" init
   set_display_mode 0 80 20
   orig = get_origin_url
-  cmd_path = orig + "cmd/"
+  array_push cmd_path orig + "cmd/"
+  array_push cmd_path "./"
   println "System ready."
   println "Type 'help' to see available commands."
 
@@ -25,6 +30,7 @@ export "step" step
     pwd = get_base_url
     set_display_mode 0 80 20
     set_step_interval -1
+    focus_input 1
     println "\n\u001b[36m" + pwd
     print "\u001b[37;1m$ \u001b[0m"
     state++
@@ -43,6 +49,11 @@ export "step" step
       state = 0
       step
 
+export "display" display
+  if state == 3
+    if (process_status current_pid) == 2
+        display_process current_pid
+
 export "break" break
   if state == 3
     kill_process current_pid
@@ -51,52 +62,26 @@ export "break" break
     shutdown
 
 func load_program name
-  read cmd_path + name + ".wasm" #run_program
+  cmd_best_wasm = null
+  for path in cmd_path
+    cmd_candidates++
+    read path + name + ".wasm" #run_program
+
 func run_program success wasm req_id
-  var args = parse_command command
+  cmd_candidates--
   if success
-    current_pid = load_process wasm
-    state++
-  else
-    println args:0 + ": command not found"
-    state = 0
-  step
+    if req_id > cmd_best_req
+      cmd_best_wasm = wasm
+  if cmd_candidates == 0
+    var args = parse_command command
+    if cmd_best_wasm
+      current_pid = load_process wasm
+      state++
+    else
+      println args:0 + ": command not found"
+      state = 0
+    step
 
 export "env.getArgs" env.getArgs
   push_from_memory command
   return size_of command
-
-
-
-
-
-` 
- ~~~ API proxy ~~~
-
-export "env.pushFromMemory" env.pushFromMemory offset len _
-  _push_from_memory offset len pid
-export "env.popToMemory" env.popToMemory offset _
-  _pop_to_memory offset pid
-export "env.teeToMemory" env.teeToMemory offset _
-  _tee_to_memory offset pid
-export "env.getBufferSize" env.getBufferSize revIndex
-  return _get_buffer_size revIndex
-export "env.displayMemory" env.displayMemory offset len screenOffset _
-  _display_memory offset len screenOffset pid
-
-export "env.setDisplayMode" env.setDisplayMode mode width height visibleWidth visibleHeight
-  set_display_mode mode width height visibleWidth visibleHeight
-
-export "env.getNativeDisplayWidth" env.getNativeDisplayWidth
-  return get_native_display_width
-export "env.getNativeDisplayHeight" env.getNativeDisplayHeight
-  return get_native_display_height
-
-export "env.setStepInterval" env.setStepInterval interval
-  set_step_interval interval
-export "env.print" env.print
-  _print
-
-export "env.shutdown" env.shutdown
-  shutdown
-   `

@@ -49,6 +49,10 @@
 ;; Audio
 (import "env" "startTone" (func $_startTone (param $channel f64) (param $frequency f64) (param $volume f64) (param $type f64) (result f64)))
 (export "env.startTone" (func $_startTone))
+(import "env" "rampFrequency" (func $_rampFrequency (param $channel f64) (param $frequency f64) (param $duration f64) (result f64)))
+(export "env.rampFrequency" (func $_rampFrequency))
+(import "env" "rampVolume" (func $_rampVolume (param $channel f64) (param $volume f64) (param $duration f64) (result f64)))
+(export "env.rampVolume" (func $_rampVolume))
 (import "env" "stopTone" (func $_stopTone (param $channel f64) (result f64)))
 (export "env.stopTone" (func $_stopTone))
 

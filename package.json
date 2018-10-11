@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/FantasyInternet/FantasyInternet.github.io#readme",
   "devDependencies": {
-    "fantasyinternet.poem": "^0.20.0",
+    "fantasyinternet.poem": "^0.21.0",
     "file-watcher": "0.0.2",
     "poetry-compiler": "^0.33.0"
   }

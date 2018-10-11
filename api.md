@@ -140,6 +140,7 @@ If the operation fails, `success` will be zero and nothing will be pushed to the
     loadProcess(wasmBinary$): processID
     processStatus(processID): state // 1=initializing, 2=ready, -1=error
     stepProcess(processID)
+    displayProcess(processID)
     callbackProcess(processID, tableIndex [, params...]): [returnValue]
     killProcess(processID)
     transferMemory(fromPID, fromOffset, length, toPID, toOffset)

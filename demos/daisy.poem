@@ -1,0 +1,41 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/audio.poem"
+
+var pos = -1
+var last_tone
+var vol = 1
+var song = 
+  27;27;27;24;24;24;20;20;20;15;15;15       ~ Daisy, Daisy,
+  17;19;20;17;17;20;15;15;15;15;15;15       ~ Give me your answer, do!
+  22;22;22;27;27;27;24;24;24;20;20;20       ~ I'm half crazy,
+  17;19;20;22;22;24;22;22;22;22;22          ~ All for the love of you!
+  24;25;24;22;27;27;24;22;20;20;20;20       ~ It won't be a stylish marriage,
+  22;24;24;20;17;17;19;17;15;15;15;14       ~ I can't afford a carriage,
+  15;20;20;24;22;22;15;20;20;24;22          ~ But you'll look sweet on the seat
+  24;25;27;24;20;22;22;15;20;20;20;20;20;20 ~ Of a bicycle built for two!
+
+export "init" init
+  set_display_mode 0 2 1
+  print "🎵"
+  set_step_interval 200
+
+export "step" step
+  var tone = song[pos++]
+  if tone == null ~ repeat song
+    tone = song[pos=0]
+  play_tone tone
+
+func play_tone tone channel
+  ~ fade out long tones
+  if tone == last_tone
+    vol /= 2
+  else
+    vol = 1
+  ~ calculate tone frequency
+  var freq = semitone tone
+  ~ sound like an organ
+  var multi=8
+  var chan=0
+  while multi > 1
+    start_tone chan++ freq*(multi/=2)   vol 3
+  last_tone = tone

@@ -1,0 +1,47 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/graphics.wast"
+
+var bobs = array
+
+export "init" init
+  set_display_mode 1 40 22
+  set_frame_rate 12 `frames per second`
+  add_bob screen:height*1 screen:height*1 rgb 255 0 0 127
+  add_bob screen:height*2 screen:height*2 rgb 0 255 0 127
+  add_bob screen:height*3 screen:height*3 rgb 0 0 255 127
+
+export "step" step
+  for bob in bobs
+    move_bob bob
+
+export "display" display
+  set_blending_mode 0 ~ pixel override
+  cls
+  set_blending_mode 1 ~ alpha blending
+  for bob in bobs
+    draw_bob bob
+  display_memory
+
+func add_bob x y color
+  var bob =
+    :x = x
+    :y = y
+    :c = color
+    :vx = 1
+    :vy = 1
+  array_push bobs bob
+
+func move_bob bob
+  if bob:x < 0
+    bob:vx = abs bob:vx
+  if bob:y < 0
+    bob:vy = abs bob:vy
+  if bob:x > screen:width
+    bob:vx = -1 * abs bob:vx
+  if bob:y > screen:height
+    bob:vy = -1 * abs bob:vy
+  bob:x += bob:vx
+  bob:y += bob:vy
+
+func draw_bob bob
+  rect bob:x-8 bob:y-8 16 16 bob:c

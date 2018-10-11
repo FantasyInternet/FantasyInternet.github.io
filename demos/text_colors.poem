@@ -1,0 +1,28 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/graphics.wast"
+include "fantasyinternet.poem/read_image.poem"
+
+export "init" init
+  read_image "../images/font.png" #load_font
+
+func load_font success img req_id
+  if success
+    set_display_mode 1 160 90
+    set_font img 8 8
+    draw_text "Hello there!\n"
+    set_blending_mode 2 ~ alpha lock
+    rect font 0 0 font:width font:height rgb 255 0 0
+    set_blending_mode 0
+    draw_text "Red!\n"
+    set_blending_mode 2 ~ alpha lock
+    rect font 0 0 font:width font:height rgb 0 255 0
+    set_blending_mode 0
+    draw_text "Green!\n"
+    set_blending_mode 2 ~ alpha lock
+    rect font 0 0 font:width font:height rgb 127 127 255
+    set_blending_mode 0
+    draw_text "Blue!\n"
+    display_memory
+  else
+    set_display_mode 0 80 20
+    print "Error loading font!"

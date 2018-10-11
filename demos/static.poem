@@ -1,0 +1,26 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/graphics.wast"
+import "Math" "random" rnd 0 1
+
+var grain=1
+var pixels_painted=0
+
+export "init" init
+  set_step_interval 0 ~ step as fast as possible!
+
+export "step" step
+  var w = get_native_display_width
+  var h = get_native_display_height
+  if screen:width != w || screen:height != h
+    set_display_mode 1 `(pixel mode)` w `by` h `pixels`
+  set_color (rgb (255*rnd))
+  rect (screen:width * rnd)-grain (screen:height * rnd)-grain grain*2 grain*2
+  pixels_painted += grain*grain
+
+export "display" display
+  display_memory ~ always needed when in pixel mode
+  if pixels_painted > screen:width*screen:height
+    grain--
+  else
+    grain++
+  pixels_painted=0

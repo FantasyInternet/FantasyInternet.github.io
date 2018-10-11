@@ -1,0 +1,18 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/graphics.wast"
+include "fantasyinternet.poem/mouse_input.poem"
+
+var last_x = 0
+var last_y = 0
+
+export "init" init
+  set_display_mode 1 320 180
+
+export "step" step
+  if get_mouse_pressed
+    line last_x last_y (get_mouse_x) (get_mouse_y)
+  last_x = get_mouse_x
+  last_y = get_mouse_y
+
+export "display" display
+  display_memory

@@ -1,0 +1,36 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/audio.poem"
+include "fantasyinternet.poem/graphics.wast"
+
+var background = rgb 32 32 32
+var ball =
+  :x = 0
+  :y = 0
+  :dx = 3
+  :dy = 0
+  :color = rgb 192 64 64
+
+export "init" init
+  set_display_mode 1 320 200
+  set_step_interval 1000/30
+
+export "step" step
+  stop_tone 0
+  ball:x += ball:dx
+  ball:y += ball:dy
+  if ball:x < 0
+    ball:dx = abs ball:dx
+    start_tone 0 256
+  if ball:x > screen:width
+    ball:dx = 0 - (abs ball:dx)
+    start_tone 0 256
+  if ball:y > screen:height
+    ball:dy = 0 - (abs ball:dy)
+    start_tone 0 220
+  else
+    ball:dy++
+
+export "display" display
+  rect 0 0 screen:width screen:height background
+  rect ball:x-8 ball:y-8 16 16 ball:color
+  display_memory
