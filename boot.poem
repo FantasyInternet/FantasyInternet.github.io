@@ -66,12 +66,14 @@ export "break" break
 
 func load_program name
   cmd_best_wasm = null
+  cmd_candidates = 0
   for path in cmd_path
     cmd_candidates++
     read path + name + ".wasm" #run_program
 
 func run_program success wasm req_id
-  cmd_candidates--
+  if cmd_candidates > 0
+    cmd_candidates--
   if (size_of wasm)
     if req_id > cmd_best_req
       cmd_best_req = req_id
