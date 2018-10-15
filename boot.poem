@@ -1,5 +1,6 @@
 include "fantasyinternet.poem/log.poem"
 include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/audio.poem"
 include "fantasyinternet.poem/navigation.poem"
 include "fantasyinternet.poem/cli.poem"
 include "fantasyinternet.poem/input.poem"
@@ -31,6 +32,8 @@ export "step" step
     set_display_mode 0 80 20
     set_step_interval -1
     focus_input 1
+    for channel in range 0 16
+      stop_tone channel
     println "\n\u001b[36m" + pwd
     print "\u001b[37;1m$ \u001b[0m"
     state++
