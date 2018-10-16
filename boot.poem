@@ -74,7 +74,7 @@ func load_program name
 func run_program success wasm req_id
   if cmd_candidates > 0
     cmd_candidates--
-  if (size_of wasm)
+  if success
     if req_id > cmd_best_req
       cmd_best_req = req_id
       cmd_best_wasm = wasm
