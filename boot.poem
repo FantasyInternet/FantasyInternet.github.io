@@ -65,6 +65,8 @@ export "break" break
     shutdown
 
 func load_program name
+  if (string_search name ".wasm") != null
+    name = (string_slice name 0 (string_search name ".wasm"))
   cmd_best_wasm = null
   cmd_candidates = 0
   for path in cmd_path
