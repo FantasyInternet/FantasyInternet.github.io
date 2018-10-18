@@ -81,7 +81,7 @@ func run_program success wasm req_id
   if cmd_candidates == 0
     var args = parse_command command
     if cmd_best_wasm
-      current_pid = load_process wasm
+      current_pid = load_process cmd_best_wasm
       state++
     else
       println args:0 + ": command not found"
