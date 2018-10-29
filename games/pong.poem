@@ -1,0 +1,48 @@
+include "fantasyinternet.poem/display.poem"
+include "fantasyinternet.poem/graphics.wast"
+include "fantasyinternet.poem/game_input.poem"
+include "fantasyinternet.poem/audio.poem"
+
+var player =
+  :x = 80
+  :width = 24
+var ball =
+  :x = 0
+  :y = 0
+  :vx = 1
+  :vy = 1
+  :size = 2
+
+export "init" init
+  set_display_mode 1 `1 means pixel mode` 160 `by` 90 `pixels`
+  set_frame_rate 30 `frames per second`
+
+export "step" step
+  stop_tone 0
+  var gamepad_x = get_game_axis_x
+  player:x += gamepad_x * 2
+  ball:x += ball:vx
+  ball:y += ball:vy
+  if ball:x < 0
+    ball:vx = abs ball:vx
+    start_tone 0 512
+  if ball:y < 0
+    ball:vy = abs ball:vy
+    start_tone 0 512
+  if ball:x > screen:width
+    ball:vx = 0 - abs ball:vx
+    start_tone 0 512
+  if ball:y > screen:height-5
+    if ball:x > player:x && ball:x < player:x+32
+      start_tone 0 256
+      ball:vx += gamepad_x
+      ball:vy = 0 - abs ball:vy
+    else
+      ball:vx /= 2
+      ball:y = 0
+
+export "display" display
+  rect 0 0 screen:width screen:height (rgb 0 0 0)
+  rect player:x 86 player:width 10
+  rect ball:x-ball:size ball:y-ball:size ball:size*2 ball:size*2
+  display_memory ~ always needed when in pixel mode
