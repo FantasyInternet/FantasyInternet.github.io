@@ -33,7 +33,7 @@ export "step" step
     ball:vx = 0 - abs ball:vx
     start_tone 0 512
   if ball:y > screen:height-5
-    if ball:x > player:x && ball:x < player:x+32
+    if ball:x > player:x && ball:x < player:x+player:width
       start_tone 0 256
       ball:vx += gamepad_x
       ball:vy = 0 - abs ball:vy
