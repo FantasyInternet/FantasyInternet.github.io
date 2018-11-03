@@ -1,4 +1,4 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){module.exports={"name":"cyberterminal","version":"0.9.5","description":"A fantasy internet client.","author":{"name":"poeticandroid","url":"http://poeticandroid.online/","email":"i@poeticandroid.online"},"private":true,"build":{"appId":"poeticandroid.cyberterminal","productName":"CyberTerminal","nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true},"win":{"target":[{"target":"nsis","arch":["x64","ia32"]}],"icon":"icons/512x512.png"},"mac":{"category":"public.app-category.utilities"},"linux":{"target":[{"target":"deb","arch":["x64","ia32"]}],"icon":"icons/","category":"Network"},"directories":{"buildResources":"./build/electron-version/","app":"./build/electron-version/","output":"./build-desktop/"}},"scripts":{"prepare":"jake","build":"jake","build-desktop":"electron-builder","deploy":"jake deploy","start":"statify -d ./build/","watch":"jake watch"},"devDependencies":{"@types/electron":"^1.6.10","browserify":"^16.2.3","cssmin":"^0.4.3","electron-builder":"^20.28.4","fantasyinternet.poem":"^0.22.0","file-watch":"^0.1.0","ftp":"^0.3.10","htmlmin":"0.0.7","jake":"^8.0.18","jsmin":"^1.0.1","jstransformer-markdown-it":"^2.1.0","less":"^3.8.1","livereload":"^0.7.0","md5":"^2.2.1","poetry-compiler":"^0.35.0","pug":"^2.0.3","tsify":"^4.0.0","typedoc":"^0.13.0","typedoc-plugin-markdown":"^1.1.17","typescript":"^3.1.3"},"dependencies":{"statify":"^2.0.1"}}},{}],2:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class Breaker{constructor(sys){this.sys=sys;this.state={level:0};this._listeners=[];document.addEventListener("keydown",(e)=>{if(e.code==="Escape"&&this.state.level===0){this.state.level=1;setTimeout(()=>{if(this.state.level===1){this.state.level=2;this._sendState();}},1024);}});document.addEventListener("keyup",(e)=>{if(e.code==="Escape"){this._sendState();this.state.level=0;this._sendState();}});}
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){module.exports={"name":"cyberterminal","version":"0.9.6","description":"A fantasy internet client.","author":{"name":"poeticandroid","url":"http://poeticandroid.online/","email":"i@poeticandroid.online"},"private":true,"build":{"appId":"poeticandroid.cyberterminal","productName":"CyberTerminal","nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true},"win":{"target":[{"target":"nsis","arch":["x64","ia32"]}],"icon":"icons/512x512.png"},"mac":{"category":"public.app-category.utilities"},"linux":{"target":[{"target":"deb","arch":["x64","ia32"]}],"icon":"icons/","category":"Network"},"directories":{"buildResources":"./build/electron-version/","app":"./build/electron-version/","output":"./build-desktop/"}},"scripts":{"prepare":"jake","build":"jake","build-desktop":"electron-builder","deploy":"jake deploy","start":"statify -d ./build/","watch":"jake watch"},"devDependencies":{"@types/electron":"^1.6.10","browserify":"^16.2.3","cssmin":"^0.4.3","electron-builder":"^20.28.4","fantasyinternet.poem":"^0.22.0","file-watch":"^0.1.0","ftp":"^0.3.10","htmlmin":"0.0.7","jake":"^8.0.18","jsmin":"^1.0.1","jstransformer-markdown-it":"^2.1.0","less":"^3.8.1","livereload":"^0.7.0","md5":"^2.2.1","poetry-compiler":"^0.35.0","pug":"^2.0.3","tsify":"^4.0.0","typedoc":"^0.13.0","typedoc-plugin-markdown":"^1.1.17","typescript":"^3.1.3"},"dependencies":{"statify":"^2.0.1"}}},{}],2:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});class Breaker{constructor(sys){this.sys=sys;this.state={level:0};this._listeners=[];document.addEventListener("keydown",(e)=>{if(e.code==="Escape"&&this.state.level===0){this.state.level=1;setTimeout(()=>{if(this.state.level===1){this.state.level=2;this._sendState();}},1024);}});document.addEventListener("keyup",(e)=>{if(e.code==="Escape"){this._sendState();this.state.level=0;this._sendState();}});}
 addEventListener(fn){let i=this._listeners.indexOf(fn);if(i<0){this._listeners.push(fn);}}
 removeEventListener(fn){let i=this._listeners.indexOf(fn);if(i>=0){this._listeners.splice(i,1);}}
 _sendState(){let newState=JSON.stringify(this.state);if(this._lastState!==newState){this._lastState=newState;this._listeners.forEach((fn)=>{fn(this.state);});}}}
@@ -42,7 +42,7 @@ catch(error){message.success=false;value=error;}
 if(message.reqId!=null){message.cmd="response";if(value instanceof Promise){value.then((value)=>{message.value=value;machineWorker.send(message);},(value)=>{message.success=false;message.value=value;machineWorker.send(message);});}
 else{message.value=value;machineWorker.send(message);}}
 break;case"imagedata":let buffer=message.buffer;if(!buffer)
-throw"No buffer received!";this.sys.drawBitmap(buffer);requestAnimationFrame(()=>{machineWorker.send({cmd:"imagedata",width:message.width,height:message.height,buffer:buffer},[buffer]);});break;default:break;}}
+throw"No buffer received!";this.sys.drawBitmap(buffer);machineWorker.send({cmd:"imagedata",width:message.width,height:message.height,buffer:buffer},[buffer]);break;default:break;}}
 _onTextInput(state){let msg={cmd:"textInput",state:state};if(!this.machineWorkers.length)
 return;this.machineWorkers[this.machineWorkers.length-1].send(msg);}
 _onMouseInput(state){let msg={cmd:"mouseInput",state:state};if(!this.machineWorkers.length)
@@ -126,7 +126,7 @@ x--;if(this.state.buttons.y)
 y++;if(this.state.buttons.b)
 y--;let mag=Math.sqrt(Math.pow(x,2)+Math.pow(y,2));if(mag>1){x/=mag;y/=mag;}
 rightKnob.style.left=x+"em";rightKnob.style.top=y+"em";}}
-exports.default=GameInput;},{}],6:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});let wabt=require("./wabt");class Machine{constructor(){this._active=false;this._rev=0;this._nextStep=performance.now();this._stepInterval=-1;this._stepCount=0;this._stepSecond=0;this._frameCount=0;this._frameSecond=0;this._toneTypes=["square","sawtooth","triangle","sine","noise"];this._displayModes=["text","pixel"];this._displayMode=-1;this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._transferBuffer=new ArrayBuffer(8);this._lastCommit=performance.now();this._pendingCommits=[];this._pendingRequests=[];this._baseUrl="";this._originUrl="";this._romApiNames=[];this._processes=[];this._bufferStack=new Uint8Array(1024);this._bufferStackLengths=[];this._asyncCalls=0;this._inputFocus=-1;this._textInputState={type:0,text:"",pos:0,len:0,key:0};this._keyBuffer=[0];this._inputTypes=["multiline","text","password","number","url","email","tel"];this._mouseInputState={x:0,y:0,pressed:false};this._mouseTypes=["none","default"];this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._nativeDisplay={width:0,height:0};this._initCom();this._tick=this._tick.bind(this);}
+exports.default=GameInput;},{}],6:[function(require,module,exports){"use strict";Object.defineProperty(exports,"__esModule",{value:true});let wabt=require("./wabt");class Machine{constructor(){this._active=false;this._nextStep=performance.now();this._stepInterval=-1;this._stepCount=0;this._stepSecond=0;this._frameCount=0;this._frameSecond=0;this._toneTypes=["square","sawtooth","triangle","sine","noise"];this._displayModes=["text","pixel"];this._displayMode=-1;this._displayWidth=-1;this._displayHeight=-1;this._visibleWidth=-1;this._visibleHeight=-1;this._transferBuffer=new ArrayBuffer(8);this._lastCommit=performance.now();this._pendingCommits=[];this._pendingRequests=[];this._baseUrl="";this._originUrl="";this._romApiNames=[];this._processes=[];this._bufferStack=new Uint8Array(1024);this._bufferStackLengths=[];this._asyncCalls=0;this._inputFocus=-1;this._textInputState={type:0,text:"",pos:0,len:0,key:0};this._keyBuffer=[0];this._inputTypes=["multiline","text","password","number","url","email","tel"];this._mouseInputState={x:0,y:0,pressed:false};this._mouseTypes=["none","default"];this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._nativeDisplay={width:0,height:0};this._initCom();this._tick=this._tick.bind(this);}
 log(){console.log("📟",this._popString());}
 logNumber(){console.log("💡",...arguments);}
 setDisplayMode(mode,width,height,visibleWidth=width,visibleHeight=height){this._sysCall("setDisplayMode",this._displayModes[mode],width,height,visibleWidth,visibleHeight);this._displayMode=mode;this._displayWidth=width;this._displayHeight=height;this._visibleWidth=visibleWidth;this._visibleHeight=visibleHeight;switch(this._displayModes[this._displayMode]){case"text":break;case"pixel":break;default:this._displayMode=-1;this._visibleWidth=-1;this._visibleHeight=-1;throw"DisplayMode not supported!";}
@@ -169,13 +169,14 @@ head(callback,pid=0){callback=this._getCallback(callback,pid);let id=this._async
 throw"cross origin not allowed!";this._sysRequest("head",filename).then((headers)=>{callback(true,this._pushString(headers),id);}).catch((err)=>{console.error(err);callback(false,0,id);});return id;}
 post(callback,pid=0){callback=this._getCallback(callback,pid);let id=this._asyncCalls++;let data=this._popString();let filename=(new URL(this._popString(),this._baseUrl)).toString();if(filename.substr(0,this._originUrl.length)!==this._originUrl)
 throw"cross origin not allowed!";this._sysRequest("post",filename,data).then((data)=>{callback(true,this._pushString(data),id);}).catch((err)=>{console.error(err);callback(false,0,id);});return id;}
-setStepInterval(milliseconds){this._stepInterval=milliseconds;this._revUp();}
+setStepInterval(milliseconds){if(this._stepInterval<0)
+setTimeout(this._tick);this._stepInterval=milliseconds;}
 loadProcess(){let wasm=this._popArrayBuffer();let env=this._processes.length?this._generateProcessApi():this._generateRomApi();let pid=this._processes.length;this._processes.push(null);console.log("loading process",pid);WebAssembly.instantiate(wasm,{env,Math}).then((process)=>{this._processes[pid]=process;if(process.instance.exports.init){try{process.instance.exports.init();this._active=true;}
 catch(error){console.trace(error);this.killProcess(pid);this._die(error);}}
+this._nextStep=performance.now();if(pid===0)
+this._tick();}).catch((err)=>{console.trace(err);this._processes[pid]=false;if(!pid){this._die(err);}
 if(pid===0)
-this._revUp();}).catch((err)=>{console.trace(err);this._processes[pid]=false;if(!pid){this._die(err);}
-if(pid===0)
-this._revUp();});return pid;}
+this._tick();});return pid;}
 processStatus(pid){if(this._processes[pid]===false)
 return-1;if(this._processes[pid]===undefined)
 return 0;if(this._processes[pid]===null)
@@ -214,20 +215,22 @@ rampFrequency(channel,frequency,duration){this._sysCall("rampFrequency",channel,
 rampVolume(channel,volume,duration){this._sysCall("rampVolume",channel,volume,duration);}
 stopTone(channel){this._sysCall("stopTone",channel);}
 wabt(){let wast=this._popString();let module=wabt.parseWat("idunno.wast",wast);return this._pushArrayBuffer(module.toBinary({}).buffer);}
-_revUp(){this._rev++;let t=Math.round(performance.now());let step=Math.max(1,this._stepInterval);this._nextStep=t;while(this._nextStep<t+128+step*3){this._nextStep+=step;setTimeout(this._tick,this._nextStep-t,this._rev);}}
-_tick(rev=this._rev){if(rev!=this._rev)
-return;if(!this._active)
-return;let t=performance.now();let process=this._processes[0];if(!process){return this._active=false;}
-if(this._stepInterval>=0){this._nextStep+=this._stepInterval;setTimeout(this._tick,this._nextStep-t,this._rev);}
-try{this._textInputState.key=this._keyBuffer.shift()||0;if(process.instance.exports.step){process.instance.exports.step(t);this._stepCount++;if(this._stepSecond!==Math.floor(performance.now()/1000)){if(this._baseUrl.includes("?debug"))
-console.log("Plan ahead",this._nextStep-t);if(this._baseUrl.includes("?debug"))
-console.log("Steps Per Second",this._stepCount);this._stepCount=0;this._stepSecond=Math.floor(performance.now()/1000);}}
-if(this._transferBuffer&&process.instance.exports.display){process.instance.exports.display(t);this._frameCount++;if(this._frameSecond!==Math.floor(performance.now()/1000)){if(this._baseUrl.includes("?debug"))
-console.log("Frames Per Second",this._frameCount);this._frameCount=0;this._frameSecond=Math.floor(performance.now()/1000);}}}
+_tick(){if(!this._active)
+return;let t=performance.now();let deadline=t+1000/60;let process=this._processes[0];if(!process){return this._active=false;}
+if(this._stepInterval>=0){this._sysRequest("vsync").then(this._tick);}
+try{let stepped=!(process.instance.exports.step);if(process.instance.exports.step){while(this._nextStep<t&&t<deadline){this._textInputState.key=this._keyBuffer.shift()||0;process.instance.exports.step(t);this._nextStep+=this._stepInterval;stepped=true;this._stepCount++;if(this._stepSecond!==Math.floor(t/1000)){if(this._baseUrl.includes("?debug"))
+console.log("Steps Per Second",this._stepCount);this._stepCount=0;this._stepSecond=Math.floor(t/1000);}
+if(this._stepInterval<0)
+deadline=t;t=performance.now();}
+if(this._nextStep<t)
+this._nextStep=t;}
+if(stepped&&this._transferBuffer&&process.instance.exports.display){process.instance.exports.display(t);this._frameCount++;if(this._frameSecond!==Math.floor(t/1000)){if(this._baseUrl.includes("?debug"))
+console.log("Frames Per Second",this._frameCount);this._frameCount=0;this._frameSecond=Math.floor(t/1000);}}}
 catch(error){this._die(error);}}
 _initCom(){self.addEventListener("message",this._onMessage.bind(this));}
-_onMessage(e){switch(e.data.cmd){case"boot":this._pushString(e.data.url);this.setBaseUrl();this._originUrl=e.data.origin;this._pushArrayBuffer(e.data.wasm);this.loadProcess();break;case"suspend":this._active=false;this._mouseInputState.pressed=false;this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._keyBuffer=[];break;case"resume":this._active=true;if(this._displayMode>=0){this.setDisplayMode(this._displayMode,this._displayWidth,this._displayHeight,this._visibleWidth,this._visibleHeight);let txt=this._textInputState;this._textInputState={};this.setInputType(txt.type);this._pushString(txt.text);this.setInputText();this.setInputPosition(txt.pos,txt.len);this.focusInput(this._inputFocus);this._keyBuffer.push(16);}
-this._revUp();break;case"break":if(this._processes[0]&&this._processes[0].instance.exports.break){this._processes[0].instance.exports.break();}
+_onMessage(e){switch(e.data.cmd){case"boot":this._pushString(e.data.url);this.setBaseUrl();this._originUrl=e.data.origin;this._pushArrayBuffer(e.data.wasm);this.loadProcess();break;case"suspend":this._active=false;this._mouseInputState.pressed=false;this._gameInputState={axis:{x:0,y:0},buttons:{a:false,b:false,x:false,y:false}};this._keyBuffer=[];break;case"resume":console.log("resuming!");if(this._displayMode>=0){this.setDisplayMode(this._displayMode,this._displayWidth,this._displayHeight,this._visibleWidth,this._visibleHeight);let txt=this._textInputState;this._textInputState={};this.setInputType(txt.type);this._pushString(txt.text);this.setInputText();this.setInputPosition(txt.pos,txt.len);this.focusInput(this._inputFocus);this._keyBuffer.push(16);}
+this._nextStep=performance.now()+this._stepInterval;if(!this._active)
+setTimeout(()=>{this._active=true;this._tick();},128);break;case"break":if(this._processes[0]&&this._processes[0].instance.exports.break){this._processes[0].instance.exports.break();}
 else{this.shutdown();}
 break;case"imagedata":this._transferBuffer=e.data.buffer;let cb;while(cb=this._pendingCommits.pop())
 cb(this._lastCommit);break;case"resize":this._nativeDisplay.width=e.data.state.width;this._nativeDisplay.height=e.data.state.height;break;case"response":if(this._pendingRequests[e.data.reqId]){if(e.data.success){this._pendingRequests[e.data.reqId].resolve(e.data.value);}
@@ -334,7 +337,6 @@ while(this._displayCursorRow<0){this._displayCursorRow=0;}
 while(this._displayCursorRow>=this._displayHeight){this._scrollText();}}
 let selector=`div:nth-child(${this._displayCursorRow+1})\nspan:nth-child(${this._displayCursorCol+1})`;let cell=this._displayTextGrid.querySelector(selector);cell.classList.add("current");if(wideChars)
 this._resize();}
-waitForVsync(){return __awaiter(this,void 0,void 0,function*(){return new Promise((resolve,reject)=>{requestAnimationFrame(resolve);});});}
 createMachine(){return new WebMachineWorker();}
 read(filename,options={}){return __awaiter(this,void 0,void 0,function*(){let res=yield fetch(filename);if(res.ok){this._dirCache(filename,true);}
 else{this._dirCache(filename,false);throw"read error!";}
@@ -377,6 +379,7 @@ showLink(url){let dialog=this._container.querySelector(".dialog");dialog.innerHT
 addEventListener(event,fn){let listeners=[];if(event==="resize")
 listeners=this._resizeListeners;let i=listeners.indexOf(fn);if(i<0){listeners.push(fn);if(event==="resize")
 this._resize();}}
+vsync(){return new Promise(resolve=>requestAnimationFrame(resolve));}
 _initContainer(){let style=document.createElement("style");style.textContent=css_1.default.replace(/}/g,";}").replace(/;/g," !important;");document.querySelector("head").insertBefore(style,document.querySelector("head *"));this._container.innerHTML='<div class="display"></div><div class="input"><div class="text"></div><div class="mouse"></div><div class="game"></div><div class="dialog"></div></div>';this._displayContainer=this._container.querySelector(".display");addEventListener("resize",()=>{this._resize();});}
 _initCanvas(){if(!this._displayContainer)
 throw"No display container!";if(!this._displayBitmap)
